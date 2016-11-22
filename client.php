@@ -6,8 +6,8 @@ abstract class BaseClient {
     const HOST = '127.0.0.1';
     const PORT = 25000;
 
-    private $closed;
     private $socket;
+    private $closed;
 
     private $receivingLength;
     private $receivingMessage;
@@ -44,8 +44,7 @@ abstract class BaseClient {
         } while ($errorNumber == 61);
 
         socket_clear_error($this->socket);
-
-        echo 'Connected to core.' . PHP_EOL;
+        socket_set_nonblock($this->socket);
     }
 
     /**
@@ -64,7 +63,7 @@ abstract class BaseClient {
 
             if ($message === null) {
                 return false;
-            } elseif ($message === '') {
+            } elseif (!$message) {
                 return true;
             }
 
@@ -90,17 +89,17 @@ abstract class BaseClient {
      *
      * @return bool true if the message was sent, false on error
      */
-     protected function send($string) {
+    protected function send($string) {
         // If the client is closed return false.
         if ($this->closed) {
-         return false;
+            return false;
         }
 
         // Format the length of $string in an 8 chacter string and
         // form the message by concatenating it with the string.
         $length = sprintf('%8d', strlen($string));
 
-        if (strlen(length) > 8) {
+        if (strlen($length) > 8) {
             exit('Cannot send message. Too long.');
         }
 
@@ -197,12 +196,8 @@ abstract class BaseClient {
         // Loop while there are still more characters to get in
         // message.
         while (strlen($message) < $length) {
-            socket_set_nonblock($this->socket);
-
             $received = socket_read($this->socket,
                 min(1024, $length - strlen($message)));
-
-            socket_set_block($this->socket);
 
             // If there was an error return false.
             if ($received === false) {
@@ -246,11 +241,23 @@ abstract class BaseClient {
 }
 
 final class Client extends BaseClient {
+    private $connected;
+
     /**
      *
      */
     public function __construct() {
         parent::__construct();
+
+        echo 'Connected to core.' . PHP_EOL;
+
+        $this->connected = false;
+
+        while (!$this->connected) {
+            $this->handleNewMessages();
+
+            usleep(1000);
+        }
 
         // TODO Connect to the database, add private methods for
         // database calls.
@@ -279,6 +286,8 @@ final class Client extends BaseClient {
                     )
                 )));
 
+                $this->connected = true;
+
                 break;
             case 'ping':
                 $this->send(json_encode(array(
@@ -305,12 +314,6 @@ final class Client extends BaseClient {
 
 // //Temporary testing code for client.
 // $client = new Client();
-//
-// sleep(1);
-//
-// $client->handleNewMessages();
-//
-// sleep(1);
 //
 // $client->close()
 ?>
