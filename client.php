@@ -2,7 +2,7 @@
 /**
  *
  */
-class Client {
+abstract class BaseClient {
     const HOST = '127.0.0.1';
     const PORT = 25000;
 
@@ -50,12 +50,29 @@ class Client {
 
     /**
      *
+     */
+    abstract protected function handleMessage($message);
+
+    /**
+     *
      *
      * @return bool
      */
     public function handleNewMessages() {
-        if ($this->isClosed()) {
-            return false;
+        while (!$this->closed) {
+            $message = $this->receive();
+
+            if ($message === null) {
+                return false;
+            } elseif ($message === '') {
+                return true;
+            }
+
+            $succeeded = $this->handleMessage($message);
+
+            if (!$succeeded) {
+                return false;
+            }
         }
 
         return true;
@@ -74,6 +91,11 @@ class Client {
      * @return bool true if the message was sent, false on error
      */
      protected function send($string) {
+        // If the client is closed return false.
+        if ($this->closed) {
+         return false;
+        }
+
         // Format the length of $string in an 8 chacter string and
         // form the message by concatenating it with the string.
         $length = sprintf('%8d', strlen($string));
@@ -115,6 +137,11 @@ class Client {
      *                     if there is none, null on error
      */
     protected function receive() {
+        // If the client is closed return null.
+        if ($this->closed) {
+            return null;
+        }
+
         // Set the message length intially to the length of the
         // message that is still being received.
         $length = $this->lengthInProgress;
@@ -170,8 +197,12 @@ class Client {
         // Loop while there are still more characters to get in
         // message.
         while (strlen($message) < $length) {
+            socket_set_nonblock($this->socket);
+
             $received = socket_read($this->socket,
                 min(1024, $length - strlen($message)));
+
+            socket_set_block($this->socket);
 
             // If there was an error return false.
             if ($received === false) {
@@ -213,4 +244,73 @@ class Client {
         socket_close($this->socket);
     }
 }
+
+final class Client extends BaseClient {
+    /**
+     *
+     */
+    public function __construct() {
+        parent::__construct();
+
+        // TODO Connect to the database, add private methods for
+        // database calls.
+    }
+
+    /**
+     *
+     */
+    protected function handleMessage($message) {
+        $message = json_decode($message, true);
+
+        $type = $message['type'];
+        $message = $message['message'];
+
+        if ($message !== null) {
+            $type .= '.' . $message['type'];
+        }
+
+        switch ($type) {
+            case 'connect.request':
+                $this->send(json_encode(array(
+                    'type' => 'connect',
+                    'message' => array(
+                        'type' => 'data',
+                        'program' => 'flight-view'
+                    )
+                )));
+
+                break;
+            case 'ping':
+                $this->send(json_encode(array(
+                    'type' => 'ping',
+                    'message' => null
+                )));
+
+                break;
+            case 'rate.data':
+                // TODO rate.data
+
+                break;
+            // TODO add more cases
+            default:
+                echo 'Message type \'' . $type . '\' not handled.'
+                    . PHP_EOL;
+
+                return false;
+        }
+
+        return true;
+    }
+}
+
+// //Temporary testing code for client.
+// $client = new Client();
+//
+// sleep(1);
+//
+// $client->handleNewMessages();
+//
+// sleep(1);
+//
+// $client->close()
 ?>
