@@ -1,0 +1,17 @@
+{
+    "name": "flight-view",
+    "version": "0.0.1",
+    "description": "",
+    "main": "flight-view/main.js",
+    "scripts": {
+        "start": "electron ."
+    },
+    "author": "Unmanned Aerial Vehicle Team | University of Texas at Austin",
+    "license": "GPL-3.0",
+    "dependencies": {
+        "sprintf-js": "^1.0.3"
+    },
+    "devDependencies": {
+        "electron-prebuilt": "^1.4.8"
+    }
+}
