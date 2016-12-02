@@ -24,46 +24,64 @@ class Client extends EventEmitter {
 
     _addEventListeners() {
         this._socket.on('connect', () => {
-            console.log('Connected to Core.')
+            console.log('Connected to core.')
+
+            this.emit('connect')
         })
 
         this._socket.on('data', (data) => {
             this._newData += data
 
             if (this._started) {
-                this._handleNewMessages()
+                if (this._newData.length >= 8) {
+                    this._nextLength = parseInt(this._newData.substring(0, 8))
+                }
+
+                while (this._nextLength &&
+                        this._newData.length >= this._nextLength + 8) {
+
+                    let message = this._newData.substring(8,
+                        this._nextLength + 8)
+
+                    this._newData = this._newData.substring(
+                        this._nextLength + 8)
+
+                    if (this._newData.length >= 8) {
+                        this._nextLength = parseInt(
+                            this._newData.substring(0, 8))
+                    } else {
+                        this._nextLength = 0
+                    }
+
+                    this._messageHandler.handleMessage(message)
+                    this.emit('receive', message)
+                }
             }
         })
 
         this._socket.on('close', (had_error) => {
-            // TODO Handle close
+            console.log('Connection lost with core.')
+
+            this.emit('close')
         })
 
         this._socket.on('error', (e) => {
-            console.log(e.name + ': ' + e.message)
+            if (e.message.startsWith('connect ECONNREFUSED')) {
+                console.log('Could not connect to core... trying again.')
+
+                setTimeout(() => {
+                    this._socket.connect(PORT, HOST)
+                }, 5000)
+            } else {
+                console.log(e.name + ': ' + e.message)
+            }
+
+            this.emit('error', e)
         })
     }
 
     _handleNewMessages() {
-        if (this._newData.length >= 8) {
-            this._nextLength = parseInt(this._newData.substring(0, 8))
-        }
 
-        while (this._nextLength &&
-                this._newData.length >= this._nextLength + 8) {
-
-            let message = this._newData.substring(8, this._nextLength + 8)
-
-            this._newData = this._newData.substring(this._nextLength + 8)
-
-            if (this._newData.length >= 8) {
-                this._nextLength = parseInt(this._newData.substring(0, 8))
-            } else {
-                this._nextLength = 0
-            }
-
-            this._messageHandler.handleMessage(message)
-        }
     }
 
     send(message) {
@@ -72,9 +90,8 @@ class Client extends EventEmitter {
         if (length.length > 8) {
             console.error('Cannot send message. Too long.')
         } else {
-            console.log('Sending: ' + length + message)
-
             this._socket.write(length + message, 'utf8')
+            this.emit('send', length + message)
         }
     }
 
@@ -97,8 +114,6 @@ class MessageHandler extends EventEmitter {
 
     _addEventListeners() {
         this.on('connect.request', (message) => {
-            console.log(JSON.stringify(message))
-
             this._client.send(JSON.stringify({
                 type: 'connect',
                 message: {
@@ -106,8 +121,6 @@ class MessageHandler extends EventEmitter {
                     program: 'flight-view'
                 }
             }))
-
-            this._client.emit('connect')
         })
 
         this.on('ping', (message) => {
