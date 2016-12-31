@@ -1,8 +1,9 @@
-const EventEmitter = require('events')
 const IPC = require('node-ipc').IPC
 const sprintf = require('sprintf-js').sprintf
 
-class IPCClient extends EventEmitter {
+const MessageHandler = require('../../util/message-handler')
+
+class IPCClient extends MessageHandler {
     constructor(id, connectID) {
         super()
 
@@ -12,8 +13,6 @@ class IPCClient extends EventEmitter {
         this._ipc = new IPC()
         this._ipc.config.id = id
         this._ipc.config.silent = true
-
-        this._messageHandler = new MessageHandler()
     }
 
     _addEventListeners() {
@@ -22,7 +21,7 @@ class IPCClient extends EventEmitter {
         })
 
         this._ipc.of[this._connectID].on('message', (data) => {
-            this._messageHandler.handleMessage(data.message)
+            this.handleMessage(data.message)
 
             this.emit('receive', data.message)
         })
@@ -64,48 +63,6 @@ class IPCClient extends EventEmitter {
         )
 
         this.emit('send', message)
-    }
-
-    onMessage(message, callback) {
-        this._messageHandler.on(message, callback)
-    }
-}
-
-class MessageHandler extends EventEmitter {
-    constructor() {
-        super()
-
-        this.setMaxListeners(1)
-    }
-
-    // _addEventListeners() {
-    //     this.on('ping', (message) => {
-    //         this._client.send(JSON.stringify({
-    //             type: 'ping',
-    //             message: null
-    //         }))
-    //
-    //         this._client.emit('ping')
-    //     })
-    //
-    //     this.on('telemetry.data', (message) => {
-    //         this._client.emit('telemetry', message)
-    //     })
-    // }
-
-    handleMessage(message) {
-        message = JSON.parse(message)
-
-        if (message.message !== null) {
-            message.type += '.' + message.message.type
-            delete message.message.type
-        }
-
-        if (this.listenerCount(message.type)) {
-            this.emit(message.type, message.message)
-        } else {
-            console.error('Unhandled message type: \'' + message.type + '\'')
-        }
     }
 }
 

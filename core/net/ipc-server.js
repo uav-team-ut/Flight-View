@@ -1,8 +1,9 @@
-const EventEmitter = require('events')
 const IPC = require('node-ipc').IPC
 const sprintf = require('sprintf-js').sprintf
 
-class IPCServer extends EventEmitter {
+const MessageHandler = require('../../util/message-handler')
+
+class IPCServer extends MessageHandler {
     constructor(id) {
         super()
 
@@ -11,8 +12,6 @@ class IPCServer extends EventEmitter {
         this._ipc = new IPC()
         this._ipc.config.id = id
         this._ipc.config.silent = true
-
-        this._messageHandler = new MessageHandler()
 
         this._sockets = []
     }
@@ -23,7 +22,7 @@ class IPCServer extends EventEmitter {
         })
 
         this._ipc.server.on('message', (data, socket) => {
-            this._messageHandler.handleMessage(data.message, socket)
+            this.handleMessage(data.message, socket)
 
             this.emit('receive', data.message, socket)
         })
@@ -69,33 +68,6 @@ class IPCServer extends EventEmitter {
     broadcast(message) {
         for (let i = 0; i < this._sockets.length; i++) {
             this.send(this._sockets[i], message)
-        }
-    }
-
-    onMessage(message, callback) {
-        this._messageHandler.on(message, callback)
-    }
-}
-
-class MessageHandler extends EventEmitter {
-    constructor() {
-        super()
-
-        this.setMaxListeners(1)
-    }
-
-    handleMessage(message, socket) {
-        message = JSON.parse(message)
-
-        if (message.message !== null) {
-            message.type += '.' + message.message.type
-            delete message.message.type
-        }
-
-        if (this.listenerCount(message.type)) {
-            this.emit(message.type, message.message, socket)
-        } else {
-            console.error('Unhandled message type: \'' + message.type + '\'')
         }
     }
 }
