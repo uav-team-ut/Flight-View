@@ -12,8 +12,8 @@ struct Coordinate {
 
 struct Target {
     char *originalImage;
-    Coordinate topLeft;
-    Coordinate bottomRight;
+    struct Coordinate topLeft;
+    struct Coordinate bottomRight;
 
     char *orientation;
     char *shape;
