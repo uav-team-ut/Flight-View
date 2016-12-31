@@ -10,9 +10,32 @@
     height: 50px;
 }
 
+.navbar-default .navbar-brand {
+    width: 80px;
+    background-color: gray;
+}
+
+.navbar-default .navbar-brand:hover, .navbar-default .navbar-brand:focus {
+    background-color: darkgray;
+}
+
+.navbar-fixed-left {
+    width: 80px;
+    height: 100%;
+    padding-top: 50px;
+    position: fixed;
+    border-radius: 0;
+}
+
+.navbar-fixed-left .navbar-nav > li {
+    float: none;
+    width: 79px;
+}
+
 .navbar-fixed-left + .container {
     width: 100%;
     height: 100%;
+    padding-left: 80px;
     padding-top: 50px;
 }
 
@@ -22,4 +45,12 @@
 
 .btn-margin-left {
     margin-left: 15px;
+}
+
+#top-left-icon {
+    width: 45px;
+    height: 30px;
+    position: relative;
+    left: 3px;
+    bottom: 5px;
 }

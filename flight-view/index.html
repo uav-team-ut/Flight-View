@@ -16,16 +16,17 @@
         <nav class="navbar navbar-default navbar-fixed-top">
             <div class="container-fluid">
                 <div class="navbar-header">
-                    <a class="navbar-brand" href="#">UAV</a>
+                    <a type="button" ng-click="openTab = 'dashboard'" class="navbar-brand">
+                        <img id="top-left-icon" src="img/white-airplane.png">
+                    </a>
                 </div>
                 <ul class="nav navbar-nav">
-                    <li><a href="#"><span class="glyphicon glyphicon-menu-hamburger"></span></a></li>
+                    <li><a type="button"><span class="glyphicon glyphicon-menu-hamburger"></span></a></li>
                 </ul>
                 <ul class="nav navbar-nav navbar-right">
                     <li><button type="button" class="btn btn-default navbar-btn btn-sm">Listen</button></li>
                     <li><button type="button" class="btn btn-default navbar-btn btn-sm btn-margin-left">Host</button></li>
-                    <!-- <li><a href="#"><span class="glyphicon glyphicon-console" ng-click="app.ipcClient.send(JSON.stringify({type: 'console', message: null}))"></span></a></li> -->
-                    <li><a href="#" ng-click="toggleConsole()"><span class="glyphicon glyphicon-console"></span></a></li>
+                    <li><a type="button" ng-click="toggleConsole()"><span class="glyphicon glyphicon-console"></span></a></li>
                 </ul>
             <div>
         </nav>
