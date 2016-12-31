@@ -48,6 +48,15 @@ let telemetry = {
 }
 
 angular.module('flightView', ['ngAnimate', 'ngSanitize', 'ui.bootstrap'])
+    .controller('FlightViewController', ['$scope', ($scope) => {
+        $scope.openTab = 'dashboard'
+        $scope.toggleConsole = () => {
+            ipcClient.send(JSON.stringify({
+                type: 'console',
+                message: null
+            }))
+        }
+    }])
     .controller('ClientEventController', ['$scope', '$element', '$attrs',
             ($scope, $element, $attrs) => {
 
@@ -116,5 +125,3 @@ angular.module('flightView', ['ngAnimate', 'ngSanitize', 'ui.bootstrap'])
 
         $scope.watchStatus($scope, 'battery_current', 30, 40)
     }])
-
-ipcClient.connect()

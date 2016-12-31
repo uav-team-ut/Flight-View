@@ -6,8 +6,8 @@ const core = require('./core/core')
 
 app.on('ready', () => {
     let mainWindow = new BrowserWindow({
-        width: 800,
-        height: 600,
+        width: 1200,
+        height: 750,
         show: false,
         title: 'Flight View'
     })
@@ -16,5 +16,13 @@ app.on('ready', () => {
 
     mainWindow.once('ready-to-show', () => {
         mainWindow.show()
+    })
+
+    core.ipcServer.onMessage('console', () => {
+        if (!mainWindow.webContents.isDevToolsOpened()) {
+            mainWindow.webContents.openDevTools({detach: true})
+        } else {
+            mainWindow.webContents.closeDevTools()
+        }
     })
 })

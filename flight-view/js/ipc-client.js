@@ -31,11 +31,7 @@ class IPCClient extends MessageHandler {
         })
 
         this._ipc.of[this._connectID].on('error', (e) => {
-            if (e.message.startsWith('connect ECONNREFUSED')) {
-                setTimeout(() => {
-                    this._socket.connect(PORT, HOST)
-                }, 5000)
-            } else {
+            if (!e.message.startsWith('connect ECONNREFUSED')) {
                 console.log(e.name + ': ' + e.message)
             }
 
