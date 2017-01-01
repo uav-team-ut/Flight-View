@@ -4,7 +4,8 @@
     "description": "",
     "main": "main.js",
     "scripts": {
-        "start": "electron ."
+        "start": "electron .",
+        "postinstall": "node scripts/install-dependencies.js"
     },
     "author": "Unmanned Aerial Vehicle Team | University of Texas at Austin",
     "license": "GPL-3.0",

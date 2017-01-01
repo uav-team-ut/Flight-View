@@ -1,2 +1,6 @@
 /node_modules/
-/core/db/current/
+
+current/
+fonts/
+
+*.min.*
