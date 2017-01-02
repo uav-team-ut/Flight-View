@@ -2,25 +2,22 @@ Flight&nbsp;View
 ==
 > Unmanned Aerial Vehicle Team | The University of Texas at Austin
 
-Main GUI used to display telemetry and other flight information.
-
-
+Main GUI used to display telemetry and other flight information built on
+[Electron](http://electron.atom.io) by GitHub.
 
 Multiples instances of Flight&nbsp;View can be connected together so that
 single connections to other programs can be shared between them. All the
-connected instances show the same information, so that the Flight&nbsp;View
-instance in Host mode doesn't show anything different than the Flight&nbsp;View
-instances connected to it in Listen mode.
+connected instances show the same information.
 
 Installation
 --
 Ensure you have [Git](https://git-scm.com/downloads) installed on your system
 first in order to clone the repository. Alternatively, the files may be simply
-downloaded from Github for installation.
+downloaded from GitHub for installation.
 
-[Node.js](https://nodejs.org/en/download/) and npm are needed to install and
-run Flight&nbsp;View. Install Node.js (the package manager npm is included with
-it as well).
+Node.js and npm are needed to install and run Flight&nbsp;View. Install
+[Node.js](https://nodejs.org/en/download/) (the package manager npm is
+included with it as well).
 
 Navigate to the directory where you want to install Flight&nbsp;View and run
 the following to clone the repository and install all needed dependencies:
