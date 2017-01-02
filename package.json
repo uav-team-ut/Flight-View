@@ -20,6 +20,6 @@
         "sprintf-js": "^1.0.3"
     },
     "devDependencies": {
-        "electron-prebuilt": "^1.4.13",
+        "electron-prebuilt": "^1.4.13"
     }
 }
