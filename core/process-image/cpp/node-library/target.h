@@ -5,6 +5,10 @@
 extern "C" {
 #endif
 
+const char *TARGET_ORIENTATIONS[];
+const char *TARGET_SHAPES[];
+const char *TARGET_COLORS[];
+
 struct Coordinate {
     int x;
     int y;
