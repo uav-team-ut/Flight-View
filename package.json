@@ -20,6 +20,7 @@
         "sprintf-js": "^1.0.3"
     },
     "devDependencies": {
+        "chai": "^3.5.0",
         "electron-prebuilt": "1.4.13",
         "mocha": "^3.2.0"
     }

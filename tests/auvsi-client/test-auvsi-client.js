@@ -15,19 +15,18 @@
  * mocha run test-auvsi-client.js
  */
 
-const assert = require('assert');
+const assert = require('chai').assert;
+const spawn = require('child_process').spawnSync;
+const request = require('request');
+const fs = require('fs');
 
 describe('AUVSIClient', function () {
     const AUVSIClient = require('../../core/net/auvsi-client');
-    const fork = require('child_process').fork;
 
     this.bail(true);
 
     before(function (done) {
         this.timeout(0);
-
-        const spawn = require('child_process').spawnSync;
-        const request = require('request');
 
         let docker = spawn('docker', ['rm', 'test-auvsi', '-f']);
         docker = spawn('docker', ['run', '-d', '-i', '-t', '-p', '8080:80',
@@ -39,26 +38,20 @@ describe('AUVSIClient', function () {
         }
 
         let connect = () => {
-            (new Promise((resolve, reject) => {
-                let options = {
-                    url: 'http://localhost:8080/api/login',
-                    form: {
-                        username: '',
-                        password: ''
-                    }
+            let options = {
+                url: 'http://localhost:8080/api/login',
+                form: {
+                    username: '',
+                    password: ''
                 }
+            };
 
-                request.post(options, (error, response, body) => {
-                    if (!error && response.statusCode === 400) {
-                        resolve();
-                    } else {
-                        reject();
-                    }
-                });
-            })).then(() => {
-                done();
-            }, () => {
-                setTimeout(connect, 1000);
+            request.post(options, (error, response, body) => {
+                if (!error && response.statusCode === 400) {
+                    done();
+                } else {
+                    setTimeout(connect, 1000);
+                }
             });
         };
 
@@ -67,8 +60,6 @@ describe('AUVSIClient', function () {
 
     after(function () {
         this.timeout(0);
-
-        const spawn = require('child_process').spawnSync;
 
         let docker = spawn('docker', ['rm', 'test-auvsi', '-f']);
 
@@ -99,7 +90,7 @@ describe('AUVSIClient', function () {
 
                 done();
             });
-        })
+        });
 
         it('should return an error if username and password are invalid',
                 function (done) {
@@ -141,7 +132,7 @@ describe('AUVSIClient', function () {
                     (error) => {
                 done();
             });
-        })
+        });
 
         it('should return an error if not logged in', function (done) {
             client = new AUVSIClient();
@@ -187,7 +178,7 @@ describe('AUVSIClient', function () {
                     (error) => {
                 done();
             });
-        })
+        });
 
         it('should return an error if not logged in', function (done) {
             client = new AUVSIClient();
@@ -282,7 +273,7 @@ describe('AUVSIClient', function () {
                     longitude: 12.123456789,
                     altitude_msl: 12.123456789,
                     uas_heading: 12.123456789
-                }
+                };
 
                 done();
             });
@@ -374,7 +365,7 @@ describe('AUVSIClient', function () {
                     alphanumeric_color: 'white',
                     description: 'desc',
                     autonomous: true
-                }
+                };
 
                 done();
             });
@@ -681,8 +672,6 @@ describe('AUVSIClient', function () {
         let image;
 
         beforeEach(function (done) {
-            const fs = require('fs');
-
             client = new AUVSIClient();
 
             client.login('http://localhost:8080', 'testuser', 'testpass',
@@ -758,8 +747,6 @@ describe('AUVSIClient', function () {
         });
 
         it('should return a valid base 64 png with id 2', function (done) {
-            const fs = require('fs');
-
             client.getTargetImage(2, (error, image) => {
                 assert.ifError(error);
                 assert.strictEqual(image, Buffer.from(
@@ -776,8 +763,6 @@ describe('AUVSIClient', function () {
         let image;
 
         beforeEach(function (done) {
-            const fs = require('fs');
-
             client = new AUVSIClient();
 
             client.login('http://localhost:8080', 'testuser', 'testpass',
