@@ -21,7 +21,7 @@ describe('AUVSIClient', function () {
     const AUVSIClient = require('../../core/net/auvsi-client');
     const fork = require('child_process').fork;
 
-    //this.bail(true);
+    this.bail(true);
 
     before(function (done) {
         this.timeout(0);
@@ -78,8 +78,8 @@ describe('AUVSIClient', function () {
         }
     });
 
-    describe('#login()', () => {
-        it('should return an error if URL is invalid', (done) => {
+    describe('#login()', function () {
+        it('should return an error if URL is invalid', function (done) {
             let client = new AUVSIClient();
 
             client.login('invalid url', '', '', (error) => {
@@ -90,7 +90,7 @@ describe('AUVSIClient', function () {
             });
         });
 
-        it('should return an error if connection is refused', (done) => {
+        it('should return an error if connection is refused', function (done) {
             let client = new AUVSIClient();
 
             client.login('http://localhost:8001', '', '', (error) => {
@@ -102,7 +102,7 @@ describe('AUVSIClient', function () {
         })
 
         it('should return an error if username and password are invalid',
-                (done) => {
+                function (done) {
             let client = new AUVSIClient();
 
             client.login('http://localhost:8080', 'wronguser', 'wrongpass',
@@ -115,7 +115,7 @@ describe('AUVSIClient', function () {
         });
 
         it('should return null with valid URL and default user credentials',
-                (done) => {
+                function (done) {
             let client = new AUVSIClient();
 
             client.login('http://localhost:8080', 'testuser', 'testpass',
@@ -123,7 +123,7 @@ describe('AUVSIClient', function () {
         });
 
         it('should return null with valid URL and default admin credentials',
-                (done) => {
+                function (done) {
             let client = new AUVSIClient();
 
             client.login('http://localhost:8080', 'testadmin', 'testpass',
@@ -131,10 +131,10 @@ describe('AUVSIClient', function () {
         });
     });
 
-    describe('#getMissions()', () => {
+    describe('#getMissions()', function () {
         let client;
 
-        beforeEach((done) => {
+        beforeEach(function (done) {
             client = new AUVSIClient();
 
             client.login('http://localhost:8080', 'testuser', 'testpass',
@@ -143,7 +143,7 @@ describe('AUVSIClient', function () {
             });
         })
 
-        it('should return an error if not logged in', (done) => {
+        it('should return an error if not logged in', function (done) {
             client = new AUVSIClient();
 
             client.getMissions((error, missions) => {
@@ -154,7 +154,7 @@ describe('AUVSIClient', function () {
             });
         });
 
-        it('should return an error if connection is refused', (done) => {
+        it('should return an error if connection is refused', function (done) {
             client._url = 'http://localhost:8001';
 
             client.getMissions((error, missions) => {
@@ -165,7 +165,7 @@ describe('AUVSIClient', function () {
             });
         });
 
-        it('should return a list with one mission', (done) => {
+        it('should return a list with one mission', function (done) {
             client.getMissions((error, missions) => {
                 assert.ifError(error);
                 assert.strictEqual(missions.length, 1);
@@ -177,10 +177,10 @@ describe('AUVSIClient', function () {
         });
     });
 
-    describe('#getMission()', () => {
+    describe('#getMission()', function () {
         let client;
 
-        beforeEach((done) => {
+        beforeEach(function (done) {
             client = new AUVSIClient();
 
             client.login('http://localhost:8080', 'testuser', 'testpass',
@@ -189,7 +189,7 @@ describe('AUVSIClient', function () {
             });
         })
 
-        it('should return an error if not logged in', (done) => {
+        it('should return an error if not logged in', function (done) {
             client = new AUVSIClient();
 
             client.getMission(1, (error, mission) => {
@@ -200,7 +200,7 @@ describe('AUVSIClient', function () {
             });
         });
 
-        it('should return an error if connection is refused', (done) => {
+        it('should return an error if connection is refused', function (done) {
             client._url = 'http://localhost:8001';
 
             client.getMission(1, (error, mission) => {
@@ -211,7 +211,7 @@ describe('AUVSIClient', function () {
             });
         });
 
-        it('should return a mission with id 1', (done) => {
+        it('should return a mission with id 1', function (done) {
             client.getMission(1, (error, mission) => {
                 assert.ifError(error);
                 assert.strictEqual(mission.id, 1);
@@ -223,10 +223,10 @@ describe('AUVSIClient', function () {
         });
     });
 
-    describe('#getObstacles()', () => {
+    describe('#getObstacles()', function () {
         let client;
 
-        beforeEach((done) => {
+        beforeEach(function (done) {
             client = new AUVSIClient();
 
             client.login('http://localhost:8080', 'testuser', 'testpass',
@@ -235,7 +235,7 @@ describe('AUVSIClient', function () {
             });
         });
 
-        it('should return an error if not logged in', (done) => {
+        it('should return an error if not logged in', function (done) {
             client = new AUVSIClient();
 
             client.getObstacles((error, obstacles) => {
@@ -246,7 +246,7 @@ describe('AUVSIClient', function () {
             });
         });
 
-        it('should return an error if connection is refused', (done) => {
+        it('should return an error if connection is refused', function (done) {
             client._url = 'http://localhost:8001';
 
             client.getObstacles((error, obstacles) => {
@@ -257,7 +257,7 @@ describe('AUVSIClient', function () {
             });
         });
 
-        it('should return a set of obstacles', (done) => {
+        it('should return a set of obstacles', function (done) {
             client.getObstacles((error, obstacles) => {
                 assert.ifError(error);
                 assert.equal(obstacles.hasOwnProperty('stationary_obstacles'),
@@ -268,11 +268,11 @@ describe('AUVSIClient', function () {
         });
     });
 
-    describe('#postTelemetry()', () => {
+    describe('#postTelemetry()', function () {
         let client;
         let telemetry;
 
-        beforeEach((done) => {
+        beforeEach(function (done) {
             client = new AUVSIClient();
 
             client.login('http://localhost:8080', 'testuser', 'testpass',
@@ -288,7 +288,7 @@ describe('AUVSIClient', function () {
             });
         });
 
-        it('should return an error if not logged in', (done) => {
+        it('should return an error if not logged in', function (done) {
             client = new AUVSIClient();
 
             client.postTelemetry(telemetry, (error) => {
@@ -299,7 +299,7 @@ describe('AUVSIClient', function () {
             });
         });
 
-        it('should return an error if connection is refused', (done) => {
+        it('should return an error if connection is refused', function (done) {
             client._url = 'http://localhost:8001';
 
             client.postTelemetry(telemetry, (error) => {
@@ -310,7 +310,8 @@ describe('AUVSIClient', function () {
             });
         });
 
-        it('should return an error if telemetry is missing keys', (done) => {
+        it('should return an error if telemetry is missing keys',
+                function (done) {
             delete telemetry.latitude;
 
             client.postTelemetry(telemetry, (error) => {
@@ -322,7 +323,8 @@ describe('AUVSIClient', function () {
             });
         });
 
-        it('should return an error if telemetry has extra keys', (done) => {
+        it('should return an error if telemetry has extra keys',
+                function (done) {
             telemetry.extra = 0;
 
             client.postTelemetry(telemetry, (error) => {
@@ -335,7 +337,7 @@ describe('AUVSIClient', function () {
         });
 
         it('should return an error if telemetry has a key of the wrong type',
-                (done) => {
+                function (done) {
             telemetry.latitude = 'string';
 
             client.postTelemetry(telemetry, (error) => {
@@ -347,16 +349,16 @@ describe('AUVSIClient', function () {
             });
         });
 
-        it('should return null with valid telemetry', (done) => {
+        it('should return null with valid telemetry', function (done) {
             client.postTelemetry(telemetry, done);
         });
     });
 
-    describe('#postTarget()', () => {
+    describe('#postTarget()', function () {
         let client;
         let target;
 
-        beforeEach((done) => {
+        beforeEach(function (done) {
             client = new AUVSIClient();
 
             client.login('http://localhost:8080', 'testuser', 'testpass',
@@ -378,7 +380,7 @@ describe('AUVSIClient', function () {
             });
         });
 
-        it('should return an error if not logged in', (done) => {
+        it('should return an error if not logged in', function (done) {
             client = new AUVSIClient();
 
             client.postTarget(target, (error) => {
@@ -389,7 +391,7 @@ describe('AUVSIClient', function () {
             });
         });
 
-        it('should return an error if connection is refused', (done) => {
+        it('should return an error if connection is refused', function (done) {
             client._url = 'http://localhost:8001';
 
             client.postTarget(target, (error, target) => {
@@ -400,7 +402,7 @@ describe('AUVSIClient', function () {
             });
         });
 
-        it('should return an error if target has extra keys', (done) => {
+        it('should return an error if target has extra keys', function (done) {
             target.extra = 0;
 
             client.postTarget(target, (error, target) => {
@@ -413,7 +415,7 @@ describe('AUVSIClient', function () {
         });
 
         it('should return an error if target has a key of the wrong type',
-                (done) => {
+                function (done) {
             target.description = 0;
 
             client.postTarget(target, (error, target) => {
@@ -425,7 +427,8 @@ describe('AUVSIClient', function () {
             });
         });
 
-        it('should return a target if target is missing keys', (done) => {
+        it('should return a target if target is missing keys',
+                function (done) {
             delete target.description;
 
             client.postTarget(target, (error, target) => {
@@ -436,7 +439,7 @@ describe('AUVSIClient', function () {
             });
         });
 
-        it('should return a target with valid target', (done) => {
+        it('should return a target with valid target', function (done) {
             client.postTarget(target, (error, target) => {
                 assert.ifError(error);
                 assert.equal(target.hasOwnProperty('description'), true);
@@ -446,10 +449,10 @@ describe('AUVSIClient', function () {
         });
     });
 
-    describe('#getTargets()', () => {
+    describe('#getTargets()', function () {
         let client;
 
-        beforeEach((done) => {
+        beforeEach(function (done) {
             client = new AUVSIClient();
 
             client.login('http://localhost:8080', 'testuser', 'testpass',
@@ -458,7 +461,7 @@ describe('AUVSIClient', function () {
             });
         });
 
-        it('should return an error if not logged in', (done) => {
+        it('should return an error if not logged in', function (done) {
             client = new AUVSIClient();
 
             client.getTargets((error, targets) => {
@@ -469,7 +472,7 @@ describe('AUVSIClient', function () {
             });
         });
 
-        it('should return an error if connection is refused', (done) => {
+        it('should return an error if connection is refused', function (done) {
             client._url = 'http://localhost:8001';
 
             client.getTargets((error, targets) => {
@@ -480,7 +483,7 @@ describe('AUVSIClient', function () {
             });
         });
 
-        it('should return a list with two targets', (done) => {
+        it('should return a list with two targets', function (done) {
             client.getTargets((error, targets) => {
                 assert.ifError(error);
 
@@ -492,10 +495,10 @@ describe('AUVSIClient', function () {
         });
     });
 
-    describe('#getTarget()', () => {
+    describe('#getTarget()', function () {
         let client;
 
-        beforeEach((done) => {
+        beforeEach(function (done) {
             client = new AUVSIClient();
 
             client.login('http://localhost:8080', 'testuser', 'testpass',
@@ -504,7 +507,7 @@ describe('AUVSIClient', function () {
             });
         });
 
-        it('should return an error if not logged in', (done) => {
+        it('should return an error if not logged in', function (done) {
             client = new AUVSIClient();
 
             client.getTarget(1, (error, target) => {
@@ -515,7 +518,7 @@ describe('AUVSIClient', function () {
             });
         });
 
-        it('should return an error if connection is refused', (done) => {
+        it('should return an error if connection is refused', function (done) {
             client._url = 'http://localhost:8001';
 
             client.getTarget(1, (error, target) => {
@@ -526,7 +529,7 @@ describe('AUVSIClient', function () {
             });
         });
 
-        it('should return a target with id 1', (done) => {
+        it('should return a target with id 1', function (done) {
             client.getTarget(1, (error, target) => {
                 assert.ifError(error);
                 assert.strictEqual(target.id, 1);
@@ -537,11 +540,11 @@ describe('AUVSIClient', function () {
         });
     });
 
-    describe('#putTarget()', () => {
+    describe('#putTarget()', function () {
         let client;
         let target;
 
-        beforeEach((done) => {
+        beforeEach(function (done) {
             client = new AUVSIClient();
 
             client.login('http://localhost:8080', 'testuser', 'testpass',
@@ -563,7 +566,7 @@ describe('AUVSIClient', function () {
             });
         });
 
-        it('should return an error if not logged in', (done) => {
+        it('should return an error if not logged in', function (done) {
             client = new AUVSIClient();
 
             client.putTarget(1, target, (error) => {
@@ -574,7 +577,7 @@ describe('AUVSIClient', function () {
             });
         });
 
-        it('should return an error if connection is refused', (done) => {
+        it('should return an error if connection is refused', function (done) {
             client._url = 'http://localhost:8001';
 
             client.putTarget(1, target, (error, target) => {
@@ -585,7 +588,7 @@ describe('AUVSIClient', function () {
             });
         });
 
-        it('should return an error if target has extra keys', (done) => {
+        it('should return an error if target has extra keys', function (done) {
             target.extra = 0;
 
             client.putTarget(1, target, (error, target) => {
@@ -598,7 +601,7 @@ describe('AUVSIClient', function () {
         });
 
         it('should return an error if target has a key of the wrong type',
-                (done) => {
+                function (done) {
             target.description = 0;
 
             client.putTarget(1, target, (error, target) => {
@@ -610,7 +613,8 @@ describe('AUVSIClient', function () {
             });
         });
 
-        it('should return a target if target is missing keys', (done) => {
+        it('should return a target if target is missing keys',
+                function (done) {
             delete target.description;
 
             client.putTarget(1, target, (error, target) => {
@@ -622,7 +626,7 @@ describe('AUVSIClient', function () {
             });
         });
 
-        it('should return a target with valid target', (done) => {
+        it('should return a target with valid target', function (done) {
             client.putTarget(1, target, (error, target) => {
                 assert.ifError(error);
                 assert.strictEqual(target.id, 1);
@@ -633,10 +637,10 @@ describe('AUVSIClient', function () {
         });
     });
 
-    describe('#deleteTarget()', () => {
+    describe('#deleteTarget()', function () {
         let client;
 
-        beforeEach((done) => {
+        beforeEach(function (done) {
             client = new AUVSIClient();
 
             client.login('http://localhost:8080', 'testuser', 'testpass',
@@ -645,7 +649,7 @@ describe('AUVSIClient', function () {
             });
         });
 
-        it('should return an error if not logged in', (done) => {
+        it('should return an error if not logged in', function (done) {
             client = new AUVSIClient();
 
             client.deleteTarget(1, (error) => {
@@ -656,7 +660,7 @@ describe('AUVSIClient', function () {
             });
         });
 
-        it('should return an error if connection is refused', (done) => {
+        it('should return an error if connection is refused', function (done) {
             client._url = 'http://localhost:8001';
 
             client.deleteTarget(1, (error) => {
@@ -667,16 +671,16 @@ describe('AUVSIClient', function () {
             });
         });
 
-        it('should return null with id 1', (done) => {
+        it('should return null with id 1', function (done) {
             client.deleteTarget(1, done);
         });
     });
 
-    describe('#postTargetImage()', () => {
+    describe('#postTargetImage()', function () {
         let client;
         let image;
 
-        beforeEach((done) => {
+        beforeEach(function (done) {
             const fs = require('fs');
 
             client = new AUVSIClient();
@@ -686,11 +690,12 @@ describe('AUVSIClient', function () {
                 done();
             });
 
-            image = Buffer.from(fs.readFileSync('test-image-1.png'))
+            image = Buffer.from(
+                    fs.readFileSync(__dirname + '/test-image-1.png'))
                     .toString('base64');
         })
 
-        it('should return an error if not logged in', (done) => {
+        it('should return an error if not logged in', function (done) {
             client = new AUVSIClient();
 
             client.postTargetImage(2, image, (error) => {
@@ -701,7 +706,7 @@ describe('AUVSIClient', function () {
             });
         });
 
-        it('should return an error if connection is refused', (done) => {
+        it('should return an error if connection is refused', function (done) {
             client._url = 'http://localhost:8001';
 
             client.postTargetImage(2, image, (error) => {
@@ -712,17 +717,16 @@ describe('AUVSIClient', function () {
             });
         });
 
-        it('should return null with id 2 and valid base 64 png', (done) => {
+        it('should return null with id 2 and valid base 64 png',
+                function (done) {
             client.postTargetImage(2, image, done);
         });
     });
 
-    describe('#getTargetImage()', () => {
+    describe('#getTargetImage()', function () {
         let client;
 
-        beforeEach((done) => {
-            const fs = require('fs');
-
+        beforeEach(function (done) {
             client = new AUVSIClient();
 
             client.login('http://localhost:8080', 'testuser', 'testpass',
@@ -731,7 +735,7 @@ describe('AUVSIClient', function () {
             });
         });
 
-        it('should return an error if not logged in', (done) => {
+        it('should return an error if not logged in', function (done) {
             client = new AUVSIClient();
 
             client.getTargetImage(2, (error, image) => {
@@ -742,7 +746,7 @@ describe('AUVSIClient', function () {
             });
         });
 
-        it('should return an error if connection is refused', (done) => {
+        it('should return an error if connection is refused', function (done) {
             client._url = 'http://localhost:8001';
 
             client.getTargetImage(2, (error, image) => {
@@ -753,24 +757,25 @@ describe('AUVSIClient', function () {
             });
         });
 
-        it('should return a valid base 64 png with id 2', (done) => {
+        it('should return a valid base 64 png with id 2', function (done) {
             const fs = require('fs');
 
             client.getTargetImage(2, (error, image) => {
                 assert.ifError(error);
                 assert.strictEqual(image, Buffer.from(
-                    fs.readFileSync('test-image-1.png')).toString('base64'));
+                    fs.readFileSync(__dirname + '/test-image-1.png'))
+                    .toString('base64'));
 
                 done()
             });
         });
     });
 
-    describe('#putTargetImage()', () => {
+    describe('#putTargetImage()', function () {
         let client;
         let image;
 
-        beforeEach((done) => {
+        beforeEach(function (done) {
             const fs = require('fs');
 
             client = new AUVSIClient();
@@ -780,11 +785,12 @@ describe('AUVSIClient', function () {
                 done();
             });
 
-            image = Buffer.from(fs.readFileSync('test-image-2.png'))
+            image = Buffer.from(
+                    fs.readFileSync(__dirname + '/test-image-2.png'))
                     .toString('base64');
         });
 
-        it('should return an error if not logged in', (done) => {
+        it('should return an error if not logged in', function (done) {
             client = new AUVSIClient();
 
             client.putTargetImage(2, image, (error) => {
@@ -795,7 +801,7 @@ describe('AUVSIClient', function () {
             });
         });
 
-        it('should return an error if connection is refused', (done) => {
+        it('should return an error if connection is refused', function (done) {
             client._url = 'http://localhost:8001';
 
             client.putTargetImage(2, image, (error) => {
@@ -806,17 +812,16 @@ describe('AUVSIClient', function () {
             });
         });
 
-        it('should return null with id 2 and valid base 64 png', (done) => {
+        it('should return null with id 2 and valid base 64 png',
+                function (done) {
             client.putTargetImage(2, image, done);
         });
     });
 
-    describe('#deleteTargetImage()', () => {
+    describe('#deleteTargetImage()', function () {
         let client;
 
-        beforeEach((done) => {
-            const fs = require('fs');
-
+        beforeEach(function (done) {
             client = new AUVSIClient();
 
             client.login('http://localhost:8080', 'testuser', 'testpass',
@@ -825,7 +830,7 @@ describe('AUVSIClient', function () {
             });
         });
 
-        it('should return an error if not logged in', (done) => {
+        it('should return an error if not logged in', function (done) {
             client = new AUVSIClient();
 
             client.deleteTargetImage(2, (error) => {
@@ -836,7 +841,7 @@ describe('AUVSIClient', function () {
             });
         });
 
-        it('should return an error if connection is refused', (done) => {
+        it('should return an error if connection is refused', function (done) {
             client._url = 'http://localhost:8001';
 
             client.deleteTargetImage(2, (error) => {
@@ -847,7 +852,7 @@ describe('AUVSIClient', function () {
             });
         });
 
-        it('should return null with id 2', (done) => {
+        it('should return null with id 2', function (done) {
             client.deleteTargetImage(2, done);
         });
     });
