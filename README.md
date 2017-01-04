@@ -57,7 +57,7 @@ The server is released as a Docker image. To run the server, install
 [Docker](https://docs.docker.com/engine/installation/) and then run the
 following to have the server run in the Docker daemon:
 ```
-docker run -d --restart=unless-stopped --interactive --tty --publish 8000:80 --name interop-server auvsisuas/interop-server
+docker run -d -i -t -p 8000:80 --name interop-server auvsisuas/interop-server
 ```
 The following can be used to start and stop the server:
 ```
