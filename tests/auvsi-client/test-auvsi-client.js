@@ -682,7 +682,7 @@ describe('AUVSIClient', function () {
             image = Buffer.from(
                     fs.readFileSync(__dirname + '/test-image-1.png'))
                     .toString('base64');
-        })
+        });
 
         it('should return an error if not logged in', function (done) {
             client = new AUVSIClient();
@@ -753,7 +753,7 @@ describe('AUVSIClient', function () {
                     fs.readFileSync(__dirname + '/test-image-1.png'))
                     .toString('base64'));
 
-                done()
+                done();
             });
         });
     });
