@@ -11,7 +11,7 @@
  * that tests before changed the status of the server. The suite
  * will bail if a test fails.
  *
- * @example <caption>Example use in terminal<c/aption>
+ * @example <caption>Example use in terminal</caption>
  * mocha run test-auvsi-client.js
  */
 

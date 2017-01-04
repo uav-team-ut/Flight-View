@@ -93,4 +93,5 @@ connects the two processes.
 - `/core`: Files for the main process.
 - `/util`: Files shared by both the renderer and main processes.
 - `/scripts`: Scripts needed for installation, building, etc.
+- `/tests`: Tests for various files.
 - `/LICENSE`: The license for this repository.
