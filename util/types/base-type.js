@@ -12,6 +12,8 @@ class BaseType {
                 this._buildField(key, this._fieldProperties[key]);
             }
         }
+
+        this.add(fields, options);
     }
 
     _copyFieldProperties(fieldProperties, defaultField) {
@@ -56,11 +58,11 @@ class BaseType {
                 if (fieldProperties.unit.hasOwnProperty(key)) {
                     Object.defineProperty(field, key, {
                         get: () => {
-                            if (fieldProperties.unit.default) {
-                                return fieldProperties._value;
+                            if (fieldProperties.unit[key].default) {
+                                return fieldProperties.value;
                             } else {
-                                return fieldProperties.unit.convertTo(
-                                    fieldProperties._value);
+                                return fieldProperties.unit[key].convertTo(
+                                    fieldProperties.value);
                             }
                         },
                         enumerable: true
@@ -76,6 +78,59 @@ class BaseType {
                 },
                 enumerable: true
             });
+        }
+    }
+
+    _getConvertFunction(key, fieldProperties, options) {
+        let unit;
+
+        if (options === undefined) {
+            return null;
+        } else if (fieldProperties.type != 'number') {
+            return null;
+        } else if (!fieldProperties.hasOwnProperty('unit')) {
+            return null;
+        } else if (options.hasOwnProperty(key)) {
+            unit = options[key];
+        } else if (fieldProperties.hasOwnProperty('name') &&
+                options.hasOwnProperty(fieldProperties.name)) {
+            unit = options[fieldProperties.name];
+        } else {
+            return null;
+        }
+
+        if (!fieldProperties.unit.hasOwnProperty(unit)) {
+            throw new Error('Unit \'' + unit + '\' not found for \'' + key +
+                    '\'');
+        }
+
+        if (fieldProperties.unit[unit].default) {
+            return null;
+        }
+
+        return fieldProperties.unit[unit].convertFrom;
+    }
+
+    add(fields, options) {
+        for (let key in fields) {
+            if (fields.hasOwnProperty(key)) {
+                if (!this._fieldProperties.hasOwnProperty(key)) {
+                    throw new Error('Unknown field \'' + key + '\'');
+                }
+
+                let newValue = fields[key];
+
+                if (this._fieldProperties[key].type == 'number') {
+                    let convertFunction = this._getConvertFunction(key,
+                            this._fieldProperties[key], options);
+
+                    if (convertFunction) {
+                        newValue = convertFunction(newValue);
+                    }
+                }
+
+                this._fieldProperties[key].value = newValue;
+            }
         }
     }
 
