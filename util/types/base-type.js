@@ -78,6 +78,24 @@ class BaseType {
             });
         }
     }
+
+    serialize() {
+        let object = {};
+
+        for (let key in this._fieldProperties) {
+            if (this._fieldProperties.hasOwnProperty(key)) {
+                object[key] = this._fieldProperties[key].value;
+            }
+        }
+
+        return JSON.stringify(object);
+    }
+
+    static deserialize(defaultFields, string) {
+        let fields = JSON.parse(string);
+
+        return new BaseType(defaultFields, fields);
+    }
 }
 
 module.exports = BaseType;

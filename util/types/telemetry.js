@@ -97,6 +97,10 @@ class Telemetry extends BaseType {
             uas_heading: this.yaw.degrees
         };
     }
+
+    static deserialize(string) {
+        return super.deserialize(TELEMETRY_FIELDS, string);
+    }
 }
 
 module.exports = Telemetry;
