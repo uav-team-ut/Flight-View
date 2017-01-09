@@ -17,12 +17,4 @@ app.on('ready', () => {
     mainWindow.once('ready-to-show', () => {
         mainWindow.show()
     })
-
-    core.ipcServer.onMessage('console', () => {
-        if (!mainWindow.webContents.isDevToolsOpened()) {
-            mainWindow.webContents.openDevTools({detach: true})
-        } else {
-            mainWindow.webContents.closeDevTools()
-        }
-    })
 })

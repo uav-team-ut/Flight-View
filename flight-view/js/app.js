@@ -1,3 +1,5 @@
+const remote = require('electron').remote
+
 const IPCClient = require('./ipc-client')
 const sprintf = require('sprintf-js').sprintf
 
@@ -51,10 +53,13 @@ angular.module('flightView', ['ngAnimate', 'ngSanitize', 'ui.bootstrap'])
     .controller('FlightViewController', ['$scope', ($scope) => {
         $scope.openTab = 'dashboard'
         $scope.toggleConsole = () => {
-            ipcClient.send(JSON.stringify({
-                type: 'console',
-                message: null
-            }))
+            let webContents = remote.getCurrentWebContents()
+
+            if (!webContents.isDevToolsOpened()) {
+                webContents.openDevTools({detach: true})
+            } else {
+                webContents.closeDevTools()
+            }
         }
     }])
     .controller('ClientEventController', ['$scope', '$element', '$attrs',
