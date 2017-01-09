@@ -106,10 +106,6 @@ class StandardTarget extends BaseType {
             autonomous: this.autonomous.value
         };
     }
-
-    static deserialize(string) {
-        return super.deserialize(STANDARD_TARGET_FIELDS, string);
-    }
 }
 
 class OffAxisTarget extends BaseType {
@@ -122,10 +118,6 @@ class OffAxisTarget extends BaseType {
             alphanumeric_color: this.alphanumeric_color.value
         };
     }
-
-    static deserialize(string) {
-        return super.deserialize(OFF_AXIS_TARGET_FIELDS, string);
-    }
 }
 
 class EmergentTarget extends BaseType {
@@ -135,10 +127,6 @@ class EmergentTarget extends BaseType {
             longitude: this.lon.degrees,
             description: this.description.value
         };
-    }
-
-    static deserialize(string) {
-        return super.deserialize(EMERGENT_TARGET_FIELDS, string);
     }
 }
 

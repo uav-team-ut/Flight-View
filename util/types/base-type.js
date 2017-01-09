@@ -146,10 +146,10 @@ class BaseType {
         return JSON.stringify(object);
     }
 
-    static deserialize(defaultFields, string) {
+    static deserialize(string) {
         let fields = JSON.parse(string);
 
-        return new BaseType(defaultFields, fields);
+        return new this(fields);
     }
 }
 
