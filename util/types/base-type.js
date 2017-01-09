@@ -147,9 +147,14 @@ class BaseType {
     }
 
     static deserialize(string) {
+    static deserialize(string, defaults) {
         let fields = JSON.parse(string);
 
-        return new this(fields);
+        if (defaults !== undefined) {
+            return new BaseType(defaults, fields);
+        } else {
+            return new this(fields);
+        }
     }
 }
 

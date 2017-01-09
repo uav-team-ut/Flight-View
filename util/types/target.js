@@ -109,6 +109,10 @@ class StandardTarget extends BaseType {
 }
 
 class OffAxisTarget extends BaseType {
+    constructor(fields, options) {
+        super(OFF_AXIS_TARGET_FIELDS, fields, options)
+    }
+
     toAUVSITarget(OFF_AXIS_TARGET_FIELDS, fields, options) {
         return {
             orientation: this.orientation.value,
@@ -121,6 +125,10 @@ class OffAxisTarget extends BaseType {
 }
 
 class EmergentTarget extends BaseType {
+    constructor(fields, options) {
+        super(EMERGENT_TARGET_FIELDS, fields, options)
+    }
+
     toAUVSITarget(EMERGENT_TARGET_FIELDS, fields, options) {
         return {
             latitude: this.lat.degrees,
