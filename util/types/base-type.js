@@ -111,6 +111,29 @@ class BaseType {
         return fieldProperties.unit[unit].convertFrom;
     }
 
+    _getFormatFunction(key, fieldProperties, unit) {
+        if (fieldProperties.type != 'number') {
+            if (unit === undefined) {
+                return null;
+            } else {
+                throw new Error('Cannot specify unit for non-number');
+            }
+        } else if (!fieldProperties.hasOwnProperty('unit')) {
+            if (unit === undefined) {
+                return null;
+            } else {
+                throw new Error('Cannot specify unit for \'' + key + '\'');
+            }
+        }
+
+        if (!fieldProperties.unit.hasOwnProperty(unit)) {
+            throw new Error('Unit \'' + unit + '\' not found for \'' + key +
+                    '\'');
+        }
+
+        return fieldProperties.unit[unit].format;
+    }
+
     add(fields, options) {
         for (let key in fields) {
             if (fields.hasOwnProperty(key)) {
@@ -134,6 +157,23 @@ class BaseType {
         }
     }
 
+    format(format, value, unit) {
+        let newFormat = this._getFormatFunction(value,
+                this._fieldProperties[value], unit);
+
+        if (newFormat) {
+            format = newFormat.replace('{}', format);
+        }
+
+        if (unit !== undefined) {
+            value = this[value][unit];
+        } else {
+            value = this[value];
+        }
+
+        return sprintf(format, value);
+    }
+
     serialize() {
         let object = {};
 
@@ -146,7 +186,6 @@ class BaseType {
         return JSON.stringify(object);
     }
 
-    static deserialize(string) {
     static deserialize(string, defaults) {
         let fields = JSON.parse(string);
 
