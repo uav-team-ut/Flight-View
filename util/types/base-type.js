@@ -88,7 +88,7 @@ class BaseType {
         } else {
             Object.defineProperty(this, key, {
                 get: () => {
-                    return fieldProperties._value;
+                    return fieldProperties.value;
                 },
                 enumerable: true
             });
