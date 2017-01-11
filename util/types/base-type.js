@@ -255,6 +255,39 @@ class BaseType {
     }
 
     /**
+     * Returns an object that represents a BaseType object.
+     *
+     * This allows for a BaseType object to be stored in a NeDB
+     * Datastore.
+     *
+     * @see {@link fromDocument}
+     * @return {Object} The document representing the BaseType.
+     */
+    toDocument() {
+        return JSON.parse(this.serialize());
+    }
+
+    /**
+     * Returns a BaseType object from a document.
+     *
+     * This converts the string that was turned into a document back
+     * into its original form. When this class is called from a
+     * subclass of BaseType with a constructor with the signature
+     * (fields, options), an instance of the subclass is returned. If
+     * not called on a subclass pass the defaults into the function
+     * as well.
+     *
+     * @see {@link toDocument}
+     * @param  {String}   document The document to recover.
+     * @param  {Object}   defaults The BaseType defaults if needed.
+     * @return {BaseType}          The BaseType created from the
+     *                             document.
+     */
+    static fromDocument(document, defaults) {
+        return this.deserialize(JSON.stringify(document), defaults);
+    }
+
+    /**
      * Returns a string that represents a BaseType object.
      *
      * This allows for a BaseType object to be passed as a string as
