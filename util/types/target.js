@@ -4,11 +4,11 @@ const BaseType = require('./base-type');
 const targetCharacteristics = require('./target-characteristics');
 const units = require('./units');
 
-STANDARD_TARGET_FIELDS = {
+const STANDARD_TARGET_FIELDS = {
     lat: {
         type: units.ANGLE,
         verify: (lat) => {
-            return MATH.abs(lat) <= 90;
+            return Math.abs(lat) <= 90;
         },
         default: null
     },
@@ -19,11 +19,11 @@ STANDARD_TARGET_FIELDS = {
         },
         default: null
     },
-    orientation = {
+    orientation: {
         type: targetCharacteristics.ORIENTATION,
         default: null
     },
-    shape = {
+    shape: {
         type: targetCharacteristics.SHAPE,
         default: null
     },
@@ -45,12 +45,12 @@ STANDARD_TARGET_FIELDS = {
     }
 };
 
-OFF_AXIS_TARGET_FIELDS = {
-    orientation = {
+const OFF_AXIS_TARGET_FIELDS = {
+    orientation: {
         type: targetCharacteristics.ORIENTATION,
         default: null
     },
-    shape = {
+    shape: {
         type: targetCharacteristics.SHAPE,
         default: null
     },
@@ -68,11 +68,11 @@ OFF_AXIS_TARGET_FIELDS = {
     }
 };
 
-EMERGENT_TARGET_FIELDS = {
+const EMERGENT_TARGET_FIELDS = {
     lat: {
         type: units.ANGLE,
         verify: (lat) => {
-            return MATH.abs(lat) <= 90;
+            return Math.abs(lat) <= 90;
         },
         default: null
     },
@@ -89,9 +89,9 @@ EMERGENT_TARGET_FIELDS = {
     }
 };
 
-class StandardTarget extends BaseType {
+exports.StandardTarget = class StandardTarget extends BaseType {
     constructor(fields, options) {
-        super(STANDARD_TARGET_FIELDS, fields, options)
+        super(STANDARD_TARGET_FIELDS, fields, options);
     }
 
     toAUVSITarget() {
@@ -106,11 +106,11 @@ class StandardTarget extends BaseType {
             autonomous: this.autonomous.value
         };
     }
-}
+};
 
-class OffAxisTarget extends BaseType {
+exports.OffAxisTarget = class OffAxisTarget extends BaseType {
     constructor(fields, options) {
-        super(OFF_AXIS_TARGET_FIELDS, fields, options)
+        super(OFF_AXIS_TARGET_FIELDS, fields, options);
     }
 
     toAUVSITarget(OFF_AXIS_TARGET_FIELDS, fields, options) {
@@ -122,11 +122,11 @@ class OffAxisTarget extends BaseType {
             alphanumeric_color: this.alphanumeric_color.value
         };
     }
-}
+};
 
-class EmergentTarget extends BaseType {
+exports.EmergentTarget = class EmergentTarget extends BaseType {
     constructor(fields, options) {
-        super(EMERGENT_TARGET_FIELDS, fields, options)
+        super(EMERGENT_TARGET_FIELDS, fields, options);
     }
 
     toAUVSITarget(EMERGENT_TARGET_FIELDS, fields, options) {
@@ -136,8 +136,4 @@ class EmergentTarget extends BaseType {
             description: this.description.value
         };
     }
-}
-
-exports.StandardTarget = StandardTarget;
-exports.OffAxisTarget = OffAxisTarget;
-exports.EmergentTarget = EmergentTarget;
+};
