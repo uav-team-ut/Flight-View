@@ -19,6 +19,13 @@ class IPCServer extends MessageHandler {
 
     _addEventListeners() {
         this._ipc.server.on('connect', (socket) => {
+            socket.send = (message) => {
+                this._ipc.server.emit(socket, 'message', {
+                    id: this._id,
+                    message: message
+                });
+            };
+
             this._sockets.push(socket);
 
             this.emit('connect', socket);
@@ -57,16 +64,9 @@ class IPCServer extends MessageHandler {
         this._ipc.server.stop();
     }
 
-    send(socket, message) {
-        this._ipc.server.emit(socket, 'message', {
-            id: this._id,
-            message: message
-        });
-    }
-
     broadcast(message) {
         for (let i = 0; i < this._sockets.length; i++) {
-            this.send(this._sockets[i], message);
+            this._sockets[i].send(message);
         }
     }
 }

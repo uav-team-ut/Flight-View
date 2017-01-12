@@ -18,6 +18,17 @@ class TCPServer extends MessageHandler {
             socket.setEncoding('utf8');
             socket._messageBuffer = new MessageBuffer();
 
+            socket.send = (message) => {
+                let length = sprintf('%8d', message.length);
+
+                if (length.length > 8) {
+                    console.error('Cannot send message. Too long.');
+                } else {
+                    socket.write(length + message);
+                    this.emit('send', length + message, socket);
+                }
+            };
+
             this._sockets.push(socket);
 
             this._addEventListeners(socket);
@@ -72,40 +83,11 @@ class TCPServer extends MessageHandler {
         this._server.close();
     }
 
-    send(socket, message) {
-        let length = sprintf('%8d', message.length);
-
-        if (length.length > 8) {
-            console.error('Cannot send message. Too long.');
-        } else {
-            socket.write(length + message);
-            this.emit('send', length + message, socket);
-        }
-    }
-
     broadcast(message) {
         for (let i = 0; i < this._sockets.length; i++) {
-            this.send(this._sockets[i], message);
+            this._sockets[i].send(message);
         }
     }
 }
 
 module.exports = TCPServer;
-
-let server = new TCPServer(25001, 10);
-
-server.onMessage('time.request', (message, socket) => {
-    server.send(socket, JSON.stringify({
-        type: 'time',
-        message: {
-            'type': 'data',
-            'time': Date.now() / 1000
-        }
-    }));
-});
-
-server.on('send', (message, socket) => {
-    console.log(message);
-});
-
-server.listen();
