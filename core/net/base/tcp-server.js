@@ -12,13 +12,14 @@ class TCPServer extends MessageHandler {
         super();
 
         this._port = port;
-        this._maxClients = maxClients;
 
         this._server = net.createServer((socket) => {
             socket.setEncoding('utf8');
             socket._messageBuffer = new MessageBuffer();
 
             socket.send = (message) => {
+                message = JSON.parse(message);
+
                 let length = sprintf('%8d', message.length);
 
                 if (length.length > 8) {
@@ -35,6 +36,10 @@ class TCPServer extends MessageHandler {
 
             this.emit('connect', socket);
         });
+
+        if (maxClients !== undefined) {
+            this._server.maxConnections = maxClients;
+        }
 
         this._sockets = [];
     }

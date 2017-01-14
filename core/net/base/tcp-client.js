@@ -57,6 +57,8 @@ class TCPClient extends MessageHandler {
     }
 
     send(message) {
+        message = JSON.parse(message);
+
         let length = sprintf('%8d', message.length);
 
         if (length.length > 8) {
