@@ -4,8 +4,8 @@ const net = require('net');
 
 const sprintf = require('sprintf-js').sprintf;
 
-const MessageBuffer = require('../../util/message-buffer');
-const MessageHandler = require('../../util/message-handler');
+const MessageBuffer = require('../../../util/message-buffer');
+const MessageHandler = require('../../../util/message-handler');
 
 class TCPServer extends MessageHandler {
     constructor(port, maxClients) {

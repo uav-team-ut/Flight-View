@@ -4,8 +4,8 @@ const Socket = require('net').Socket;
 
 const sprintf = require('sprintf-js').sprintf;
 
-const MessageBuffer = require('../../util/message-buffer');
-const MessageHandler = require('../../util/message-handler');
+const MessageBuffer = require('../../../util/message-buffer');
+const MessageHandler = require('../../../util/message-handler');
 
 class TCPClient extends MessageHandler {
     constructor(host, port) {

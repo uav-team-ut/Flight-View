@@ -2,7 +2,7 @@
 
 const IPC = require('node-ipc').IPC;
 
-const MessageHandler = require('../../util/message-handler');
+const MessageHandler = require('../../../util/message-handler');
 
 class IPCServer extends MessageHandler {
     constructor(id) {
