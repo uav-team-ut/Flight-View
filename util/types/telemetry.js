@@ -13,7 +13,7 @@ const TELEMETRY_FIELDS = {
     lat: {
         type: units.ANGLE,
         verify: (lat) => {
-            return MATH.abs(lat) <= 90;
+            return Math.abs(lat) <= 90;
         }
     },
     lon: {
@@ -43,7 +43,19 @@ const TELEMETRY_FIELDS = {
     roll: {
         type: units.ANGLE,
         verify: (roll) => {
-            return Math.abs(rol) <= 180;
+            return Math.abs(roll) <= 180;
+        }
+    },
+    cam_pitch: {
+        type: units.ANGLE,
+        verify: (cam_pitch) => {
+            return Math.abs(cam_pitch) <= 90;
+        }
+    },
+    cam_roll: {
+        type: units.ANGLE,
+        verify: (cam_roll) => {
+            return Math.abs(cam_roll) < 180;
         }
     },
     airspeed: {
@@ -95,6 +107,19 @@ class Telemetry extends BaseType {
             longitude: this.lon.degrees,
             altitude_msl: this.alt_msl.feet,
             uas_heading: this.yaw.degrees
+        };
+    }
+
+    toImageTelemetry() {
+        return {
+            lat: this.lat.radians,
+            lon: this.lon.radians,
+            alt: this.alt.meters,
+            yaw: this.yaw.radians,
+            pitch: this.pitch.radians,
+            roll: this.roll.radians,
+            cam_pitch: this.cam_pitch.radians,
+            cam_roll: this.cam_roll.radians
         };
     }
 }
