@@ -1,3 +1,5 @@
+'use strict';
+
 const EventEmitter = require('events')
 
 class MessageBuffer extends EventEmitter {
