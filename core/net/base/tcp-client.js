@@ -42,7 +42,9 @@ class TCPClient extends MessageHandler {
         });
 
         this._messageBuffer.on('message', (message) => {
-            this.handleMessage(message);
+            this.handleMessage(message).catch((error) => {
+                console.log(error);
+            });
 
             this.emit('receive', message);
         });
@@ -57,7 +59,7 @@ class TCPClient extends MessageHandler {
     }
 
     send(message) {
-        message = JSON.parse(message);
+        message = JSON.stringify(message);
 
         let length = sprintf('%8d', message.length);
 

@@ -22,7 +22,9 @@ class IPCClient extends MessageHandler {
         });
 
         this._ipc.of[this._connectID].on('message', (data) => {
-            this.handleMessage(data.message);
+            this.handleMessage(data.message).catch((error) => {
+                console.log(error);
+            });
 
             this.emit('receive', data.message);
         });

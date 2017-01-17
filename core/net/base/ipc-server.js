@@ -32,7 +32,9 @@ class IPCServer extends MessageHandler {
         });
 
         this._ipc.server.on('message', (data, socket) => {
-            this.handleMessage(data.message, socket);
+            this.handleMessage(data.message, socket).catch((error) => {
+                console.log(error);
+            });
 
             this.emit('receive', data.message, socket);
         });

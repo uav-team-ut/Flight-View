@@ -18,7 +18,7 @@ class TCPServer extends MessageHandler {
             socket._messageBuffer = new MessageBuffer();
 
             socket.send = (message) => {
-                message = JSON.parse(message);
+                message = JSON.stringify(message);
 
                 let length = sprintf('%8d', message.length);
 
@@ -74,7 +74,12 @@ class TCPServer extends MessageHandler {
         });
 
         socket._messageBuffer.on('message', (message) => {
-            this.handleMessage(message, socket);
+            console.log(message);
+
+            message = JSON.parse(message);
+            this.handleMessage(message, socket).catch((error) => {
+                console.log(error);
+            });
 
             this.emit('receive', message, socket);
         });
