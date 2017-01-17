@@ -1,31 +1,37 @@
-const EventEmitter = require('events')
+const EventEmitter = require('events');
 
 class MessageHandler extends EventEmitter {
     constructor() {
-        super()
+        super();
 
-        this._eventEmitter = new EventEmitter()
-        this._eventEmitter.setMaxListeners(1)
+        this._callbacks = {};
     }
 
     onMessage(message, callback) {
-        this._eventEmitter.on(message, callback)
+        this._callbacks[message] = (message, socket) => {
+            return new Promise((resolve, reject) => {
+                callback(message, socket);
+
+                resolve();
+            });
+        }
     }
 
     handleMessage(message, socket) {
-        message = JSON.parse(message)
+        message = JSON.parse(JSON.stringify(message));
 
-        if (message.message !== null) {
-            message.type += '.' + message.message.type
-            delete message.message.type
+        if (message.message) {
+            message.type += '.' + message.message.type;
+            delete message.message.type;
         }
 
-        if (this._eventEmitter.listenerCount(message.type)) {
-            this._eventEmitter.emit(message.type, message.message, socket)
+        if (this._callbacks.hasOwnProperty(message.type)) {
+            return this._callbacks[message.type](message.message, socket);
         } else {
-            console.error('Unhandled message type: \'' + message.type + '\'')
+            return Promise.reject(new Error('Unhandled message type: \'' +
+                    message.type + '\''));
         }
     }
 }
 
-module.exports = MessageHandler
+module.exports = MessageHandler;
