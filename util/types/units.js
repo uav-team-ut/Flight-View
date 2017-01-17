@@ -114,7 +114,7 @@ exports.PERCENTAGE = {
     unit: {
         percent: {
             default: true,
-            format: '{}%'
+            format: '{}%%'
         }
     },
     default: 0
