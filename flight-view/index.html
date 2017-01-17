@@ -21,24 +21,48 @@
                     </a>
                 </div>
                 <ul class="nav navbar-nav">
-                    <li><a type="button"><span class="glyphicon glyphicon-menu-hamburger"></span></a></li>
+                    <li>
+                        <a type="button">
+                            <span class="glyphicon glyphicon-menu-hamburger"></span>
+                        </a>
+                    </li>
                 </ul>
                 <ul class="nav navbar-nav navbar-right">
-                    <li><button type="button" class="btn btn-default navbar-btn btn-sm">Listen</button></li>
-                    <li><button type="button" class="btn btn-default navbar-btn btn-sm btn-margin-left">Host</button></li>
-                    <li><a type="button" ng-click="toggleConsole()"><span class="glyphicon glyphicon-console"></span></a></li>
+                    <li>
+                        <div class="btn-group" uib-dropdown ng-hide="started">
+                            <button id="start-button" type="button" class="btn btn-success navbar-btn"
+                                    uib-dropdown-toggle ng-disabled="disabled">
+                                &nbsp;Start&nbsp;<span class="caret"></span>
+                            </button>
+                            <ul class="dropdown-menu" uib-dropdown-menu role="menu" aria-labelledby="start-button">
+                                <li role="menuitem">
+                                    <a ng-click="startSolo()">
+                                        Solo
+                                    </a>
+                                </li>
+                            </ul>
+                        </div>
+                        <button id="stop-button" type="button" class="btn btn-danger navbar-btn" ng-click="stop()"
+                                ng-disabled="disabled" ng-show="started">
+                            &nbsp;Stop&nbsp;
+                        </button>
+                    </li>
+                    <li>
+                        <a type="button" ng-click="toggleConsole()">
+                            <span class="glyphicon glyphicon-console"></span>
+                        </a>
+                    </li>
                 </ul>
             <div>
         </nav>
 
         <nav class="navbar navbar-inverse navbar-fixed-left">
-
         </nav>
 
         <div class="container" ng-include="openTab + '.html'"></div>
     </body>
 
     <script type="text/javascript">
-        app.ipcClient.connect()
+        app.coreClient.connect()
     </script>
 </html>
