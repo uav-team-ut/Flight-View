@@ -5,3 +5,7 @@ current/
 fonts/
 
 *.min.*
+
+image_processing_files/
+__pycache__/
+*.pyc
