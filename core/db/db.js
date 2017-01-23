@@ -5,23 +5,61 @@ const path = require('path');
 const dateFormat = require('dateformat');
 const NeDBDatastore = require('nedb');
 
+const Image = require('../../util/types/image')
 const Telemetry = require('../../util/types/telemetry');
 
 const CURRENT_DIR = path.join(__dirname, 'current');
-const ARCHIVE_DIR = path.join(__dirname, 'archive');
+const ARCHIVE_DIR = path.join(__dirname, 'archive', dateFormat(new Date(),
+        'yyyy-mm-dd HH-MM-ss'));
 
 class Database {
-    constructor(useArchives) {
+    constructor(useArchives = true) {
         this.telemetry = new TelemetryDatastore(useArchives);
+        this.images = new ImageDatastore(useArchives);
     }
 }
 
 class Datastore extends NeDBDatastore {
-    insert(doc) {
+    constructor(filename, useArchive, isArchive) {
+        let filePath = !isArchive ? CURRENT_DIR : ARCHIVE_DIR;
+
+        filePath = path.join(filePath, filename);
+
+        super({
+            filename: filePath,
+            autoload: true
+        });
+
+        this.remove({}, {multi: true});
+        this.persistence.compactDatafile();
+
+        this.filename = filename;
+        this.count = 0;
+
+        if (useArchive && !isArchive) {
+            this._archive = new TelemetryDatastore(false, true);
+        }
+    }
+
+    insert(object) {
         return new Promise((resolve, reject) => {
-            super.insert(doc, (err, doc) => {
+            let doc = object.toDocument();
+
+            this.count++;
+            doc._id = this.count.toString();
+
+            let id = doc._id;
+
+            super.insert(doc, (err, newDoc) => {
+                if (this._archive) {
+                    this._archive.insert(doc).catch((error) => {
+                        console.log('Error saving document to archive: '
+                                + error);
+                    });
+                }
+
                 if (err) reject(err);
-                else resolve(doc);
+                else resolve(id);
             });
         });
     }
@@ -44,9 +82,17 @@ class Datastore extends NeDBDatastore {
         });
     }
 
+    findID(id) {
+        if (typeof id == 'number') {
+            id = id.toString();
+        }
+
+        return this.findOne({_id: id});
+    }
+
     update(query, update, options) {
         return new Promise((resolve, reject) => {
-            super.findOne(query, update, options, (err, numAffected,
+            super.update(query, update, options, (err, numAffected,
                     affectedDocuments, upsert) => {
                 if (err) reject(err);
                 else resolve([numAffected, affectedDocuments, upsert]);
@@ -66,54 +112,11 @@ class Datastore extends NeDBDatastore {
 
 class TelemetryDatastore extends Datastore {
     constructor(useArchive, isArchive) {
-        let filename;
-
-        if (!isArchive) {
-            filename = CURRENT_DIR;
-        } else {
-            filename = path.join(ARCHIVE_DIR, dateFormat(new Date(),
-                    'yyyy-mm-dd HH-MM-ss'));
-        }
-
-        filename = path.join(filename, 'telemetry.db');
-
-        super({
-            filename: filename,
-            autoload: true
-        });
-
-        this.remove({}, {multi: true});
-        this.persistence.compactDatafile()
+        super('telemetry.db', useArchive, isArchive);
 
         this.ensureIndex({
             fieldName: 'time',
             unique: true
-        });
-
-        this.filename = filename;
-        this.count = 0;
-
-        if (useArchive && !isArchive) {
-            this._archive = new TelemetryDatastore(false, true);
-        }
-    }
-
-    insertTelemetry(telemetry) {
-        let doc = telemetry.toDocument();
-
-        doc._id = this.count.toString();
-        this.count++;
-
-        let id = doc._id;
-
-        return super.insert(doc).then((newDoc) => {
-            if (this._archive) {
-                this._archive.insertTelemetry(telemetry).catch((error) => {
-                    console.log('Error saving telemetry to archive: ' + error);
-                });
-            }
-
-            return id;
         });
     }
 
@@ -122,19 +125,15 @@ class TelemetryDatastore extends Datastore {
 
         return this.findOne({time: {$gte: time}}).then((doc) => {
             if (doc === null) {
-                let index = count - 1;
+                let index = count;
 
-                return this.findOne({_id: index.toString()}).then((doc2) => {
-                    return [doc2];
-                });
-            } else if (doc._id === '0' || doc.time === time) {
+                return this.findID(index).then((doc2) => [doc2]);
+            } else if (doc._id === '1' || doc.time === time) {
                 return [doc];
             } else {
                 let index = parseInt(doc._id) - 1;
 
-                return this.findOne({_id: index.toString()}).then((doc2) => {
-                    return [doc, doc2];
-                });
+                return this.findID(index).then((doc2) => [doc, doc2]);
             }
         });
     }
@@ -177,10 +176,16 @@ class TelemetryDatastore extends Datastore {
                                 (docs[0][key] - docs[1][key]) + docs[1][key];
                     }
                 }
-                
+
                 return Telemetry.fromDocument(averaged_doc);
             }
-        })
+        });
+    }
+}
+
+class ImageDatastore extends Datastore {
+    constructor(useArchive, isArchive) {
+        super('images.db', useArchive, isArchive);
     }
 }
 
