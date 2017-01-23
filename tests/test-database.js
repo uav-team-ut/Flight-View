@@ -15,6 +15,7 @@ const path = require('path');
 
 describe('Database', function () {
     let Database;
+    let Image;
     let Telemetry;
 
     let db;
@@ -53,7 +54,9 @@ describe('Database', function () {
 
         writeStream.on('close', () => {
             Database = require('./db-test/db');
+            Image = require('../util/types/image');
             Telemetry = require('../util/types/telemetry');
+
 
             db = new Database(false);
 
@@ -88,10 +91,10 @@ describe('Database', function () {
             t2 = new Telemetry({time: 20});
         });
 
-        describe('#insertTelemetry()', function () {
+        describe('#insert()', function () {
             it('should return an id with valid telemetry',
                     function (done) {
-                db.telemetry.insertTelemetry(t1).then((id) => {
+                db.telemetry.insert(t1).then((id) => {
                     assert.ok(id);
 
                     done();
@@ -99,10 +102,10 @@ describe('Database', function () {
             });
 
             it('should auto-increment the document id', function (done) {
-                db.telemetry.insertTelemetry(t1).then((id) => {
-                    assert.equal(id, '0');
-                }).then(() => db.telemetry.insertTelemetry(t2)).then((id) => {
+                db.telemetry.insert(t1).then((id) => {
                     assert.equal(id, '1');
+                }).then(() => db.telemetry.insert(t2)).then((id) => {
+                    assert.equal(id, '2');
 
                     done();
                 }).catch(done);
@@ -111,10 +114,10 @@ describe('Database', function () {
 
         describe('#getNearest()', function () {
             beforeEach(function (done) {
-                db.telemetry.insertTelemetry(t1).then((id) => {
-                    assert.equal(id, '0');
-                }).then(() => db.telemetry.insertTelemetry(t2)).then((id) => {
+                db.telemetry.insert(t1).then((id) => {
                     assert.equal(id, '1');
+                }).then(() => db.telemetry.insert(t2)).then((id) => {
+                    assert.equal(id, '2');
 
                     done();
                 }).catch(done);
@@ -179,10 +182,10 @@ describe('Database', function () {
 
         describe('#getApprox()', function () {
             beforeEach(function (done) {
-                db.telemetry.insertTelemetry(t1).then((id) => {
-                    assert.equal(id, '0');
-                }).then(() => db.telemetry.insertTelemetry(t2)).then((id) => {
+                db.telemetry.insert(t1).then((id) => {
                     assert.equal(id, '1');
+                }).then(() => db.telemetry.insert(t2)).then((id) => {
+                    assert.equal(id, '2');
 
                     done();
                 }).catch(done);
@@ -239,6 +242,43 @@ describe('Database', function () {
             it('should return time 20 with input time 21', function (done) {
                 db.telemetry.getApprox(21).then((telemetry) => {
                     assert.equal(telemetry.time.seconds, 20);
+
+                    done();
+                }).catch(done);
+            });
+        });
+    });
+
+    describe('#images', function () {
+        it('should be a ImageDatastore', function () {
+            assert.ok(db.images);
+        });
+    });
+
+    describe('ImageDatastore', function () {
+        let i1;
+        let i2;
+
+        beforeEach(function () {
+            i1 = new Image({time: 10});
+            i2 = new Image({time: 20});
+        });
+
+        describe('#insert()', function () {
+            it('should return an id with valid image',
+                    function (done) {
+                db.images.insert(i1).then((id) => {
+                    assert.ok(id);
+
+                    done();
+                }).catch(done);
+            });
+
+            it('should auto-increment the document id', function (done) {
+                db.images.insert(i1).then((id) => {
+                    assert.equal(id, '1');
+                }).then(() => db.images.insert(i1)).then((id) => {
+                    assert.equal(id, '2');
 
                     done();
                 }).catch(done);
