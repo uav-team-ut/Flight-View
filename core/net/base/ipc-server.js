@@ -24,6 +24,8 @@ class IPCServer extends MessageHandler {
                     id: this._id,
                     message: message
                 });
+
+                this.emit('send', message, socket);
             };
 
             this._sockets.push(socket);

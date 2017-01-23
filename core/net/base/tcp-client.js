@@ -59,15 +59,15 @@ class TCPClient extends MessageHandler {
     }
 
     send(message) {
-        message = JSON.stringify(message);
+        messageString = JSON.stringify(message);
 
-        let length = sprintf('%8d', message.length);
+        let length = sprintf('%8d', messageString.length);
 
         if (length.length > 8) {
             console.error('Cannot send message. Too long.');
         } else {
-            this._socket.write(length + message);
-            this.emit('send', length + message);
+            this._socket.write(length + messageString);
+            this.emit('send', message);
         }
     }
 }

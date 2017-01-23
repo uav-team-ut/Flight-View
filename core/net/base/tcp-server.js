@@ -18,15 +18,15 @@ class TCPServer extends MessageHandler {
             socket._messageBuffer = new MessageBuffer();
 
             socket.send = (message) => {
-                message = JSON.stringify(message);
+                messageString = JSON.stringify(message);
 
-                let length = sprintf('%8d', message.length);
+                let length = sprintf('%8d', messageString.length);
 
                 if (length.length > 8) {
                     console.error('Cannot send message. Too long.');
                 } else {
-                    socket.write(length + message);
-                    this.emit('send', length + message, socket);
+                    socket.write(length + messageString);
+                    this.emit('send', message, socket);
                 }
             };
 
@@ -74,9 +74,8 @@ class TCPServer extends MessageHandler {
         });
 
         socket._messageBuffer.on('message', (message) => {
-            console.log(message);
-
             message = JSON.parse(message);
+
             this.handleMessage(message, socket).catch((error) => {
                 console.log(error);
             });
