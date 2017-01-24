@@ -86,7 +86,7 @@ class BaseType {
 
             this[field] = newField;
         } else {
-            Object.defineProperty(this, key, {
+            Object.defineProperty(this, field, {
                 get: () => {
                     return fieldProperties.value;
                 },
