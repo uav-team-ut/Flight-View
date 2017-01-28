@@ -1,5 +1,7 @@
 'use strict';
 
+const sprintf = require('sprintf-js').sprintf;
+
 exports.TIME = {
     name: 'time',
     type: 'number',
@@ -7,6 +9,23 @@ exports.TIME = {
         seconds: {
             default: true,
             format: '{} s'
+        },
+        hhmmss: {
+            default: false,
+            format: '{}',
+            convertFrom: (hhmmss) => {
+                hhmmss = hhmmss.split(':');
+
+                return parseInt(hhmmss[0]) * 3600 + parseInt(hhmmss[1]) * 60
+                        + parseFloat(hhmmss[2]);
+            },
+            convertTo: (seconds) => {
+                let h = Math.floor(seconds / 3600);
+                let m = Math.floor((seconds - h * 3600) / 60);
+                let s = Math.round(seconds - h * 3600 - m * 60);
+
+                return sprintf('%02.0f:%02.0f:%02.0f', h, m, s)
+            }
         }
     },
     default: 0
@@ -40,7 +59,7 @@ exports.ANGLE = {
     unit: {
         degrees: {
             default: true,
-            format: '{} deg'
+            format: '{}°'
         },
         radians: {
             default: false,
