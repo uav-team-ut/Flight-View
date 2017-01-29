@@ -6,57 +6,77 @@
             <div class="attitude-box-outer">
                 <div class="attitude-box-inner"
                         ng-style="{'-webkit-transform': 'rotate(' + telemetry.roll.degrees + 'deg)'}">
-                    <div class="attitude-box-inner horizon"
-                            ng-style="{'-webkit-transform': 'translateY(' + telemetry.pitch.degrees * 0.75 + '%)'}">
+                    <div class="attitude-box-inner"
+                            ng-style="{'-webkit-transform': 'translateY(' + telemetry.pitch.degrees * 1.7 + '%)'}">
+                        <div class="attitude-box-inner horizon"></div>
+
+                        <div ng-repeat="pitch in [-35, -25, -15, -5, 5, 15, 25, 35]">
+                            <div class="attitude-box-inner" ng-style="{top: 'calc(50% - ' + pitch * 1.7 + '%)'}"
+                                    ng-if="Math.abs(pitch - telemetry.pitch.degrees) <= 23">
+                                <div class="line pitch-marker-minor-line-left"></div>
+                                <div class="line pitch-marker-minor-line-right"></div>
+                            </div>
+                        </div>
+
+                        <div ng-repeat="pitch in [-30, -20, -10, 10, 20, 30]">
+                            <div class="attitude-box-inner" ng-style="{top: 'calc(50% - ' + pitch * 1.7 + '%)'}"
+                                    ng-if="Math.abs(pitch - telemetry.pitch.degrees) <= 23">
+                                    <div class="line pitch-marker-major-line-left"></div>
+                                    <div class="line pitch-marker-major-line-right"></div>
+                                    <div class="text-box pitch-marker-major-text">
+                                        {{pitch}}
+                                    </div>
+                            </div>
+                        </div>
                     </div>
 
                     <div class="attitude-box-inner">
-                        <div class="arrow-up pitch-marker-up-arrow"></div>
+                        <div class="arrow-up roll-indicator-up-arrow"></div>
                     </div>
                 </div>
 
                 <div class="attitude-box-inner">
-                    <div class="arrow-down pitch-marker-arrow"></div>
+                    <div class="arrow-down roll-marker-arrow"></div>
                 </div>
 
                 <div class="attitude-box-inner" style="-webkit-transform: rotate(-45deg)">
-                    <div class="circle small-circle pitch-marker-circle"></div>
+                    <div class="circle small-circle roll-marker-circle"></div>
                 </div>
 
                 <div class="attitude-box-inner" style="-webkit-transform: rotate(-20deg)">
-                    <div class="circle small-circle pitch-marker-circle"></div>
+                    <div class="circle small-circle roll-marker-circle"></div>
                 </div>
 
                 <div class="attitude-box-inner" style="-webkit-transform: rotate(-10deg)">
-                    <div class="circle small-circle pitch-marker-circle"></div>
+                    <div class="circle small-circle roll-marker-circle"></div>
                 </div>
 
                 <div class="attitude-box-inner" style="-webkit-transform: rotate(10deg)">
-                    <div class="circle small-circle pitch-marker-circle"></div>
+                    <div class="circle small-circle roll-marker-circle"></div>
                 </div>
 
                 <div class="attitude-box-inner" style="-webkit-transform: rotate(20deg)">
-                    <div class="circle small-circle pitch-marker-circle"></div>
+                    <div class="circle small-circle roll-marker-circle"></div>
                 </div>
 
                 <div class="attitude-box-inner" style="-webkit-transform: rotate(45deg)">
-                    <div class="circle small-circle pitch-marker-circle"></div>
+                    <div class="circle small-circle roll-marker-circle"></div>
                 </div>
 
                 <div class="attitude-box-inner" style="-webkit-transform: rotate(-60deg)">
-                    <div class="line line-thick pitch-marker-line"></div>
+                    <div class="line line-thick roll-marker-line"></div>
                 </div>
 
                 <div class="attitude-box-inner" style="-webkit-transform: rotate(-30deg)">
-                    <div class="line line-thick pitch-marker-line"></div>
+                    <div class="line line-thick roll-marker-line"></div>
                 </div>
 
                 <div class="attitude-box-inner" style="-webkit-transform: rotate(30deg)">
-                    <div class="line line-thick pitch-marker-line"></div>
+                    <div class="line line-thick roll-marker-line"></div>
                 </div>
 
                 <div class="attitude-box-inner" style="-webkit-transform: rotate(60deg)">
-                    <div class="line line-thick pitch-marker-line"></div>
+                    <div class="line line-thick roll-marker-line"></div>
                 </div>
 
                 <div class="attitude-box-inner">

@@ -49,6 +49,21 @@
     width: 3px;
 }
 
+.text-box {
+    width: 100px;
+    text-align: center;
+}
+
+.text-box-header {
+    font-size: 10px;
+    line-height: 11px;
+}
+
+.text-box-number {
+    font-size: 18px;
+    line-height: 19px;
+}
+
 .arrow-up {
     width: 0;
     height: 0;
@@ -115,25 +130,59 @@
     right: -100%;
 }
 
-.pitch-marker-up-arrow {
+.pitch-marker-minor-line-left {
+    right: 60%;
+    height: 2px;
+    width: 10px;
+    -webkit-transform: translateY(-50%);
+}
+
+.pitch-marker-minor-line-right {
+    left: 60%;
+    height: 2px;
+    width: 10px;
+    -webkit-transform: translateY(-50%);
+}
+
+.pitch-marker-major-line-left {
+    right: 60%;
+    height: 2px;
+    width: 20px;
+    -webkit-transform: translateY(-50%);
+}
+
+.pitch-marker-major-line-right {
+    left: 60%;
+    height: 2px;
+    width: 20px;
+    -webkit-transform: translateY(-50%);
+}
+
+.pitch-marker-major-text {
+    display: inline-block;
+    font-size: 12px;
+    -webkit-transform: translateY(-50%) translateY(-2px);
+}
+
+.roll-indicator-up-arrow {
     position: absolute;
     left: 50%;
     -webkit-transform: translateX(-50%);
 }
 
-.pitch-marker-arrow {
+.roll-marker-arrow {
     margin-top: -14px;
     position: absolute;
     right: 50%;
     -webkit-transform: translateX(50%);
 }
 
-.pitch-marker-circle {
+.roll-marker-circle {
     display: inline-block;
     margin-top: -7px;
 }
 
-.pitch-marker-line {
+.roll-marker-line {
     display: inline-block;
     margin-top: -13px;
 }
@@ -182,21 +231,6 @@
     width: 25px;
     height: 100%;
     top: 0px;
-}
-
-.text-box {
-    width: 100px;
-    text-align: center;
-}
-
-.text-box-header {
-    font-size: 10px;
-    line-height: 11px;
-}
-
-.text-box-number {
-    font-size: 18px;
-    line-height: 19px;
 }
 
 .airspeed-scale {
