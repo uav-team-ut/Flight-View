@@ -31,6 +31,24 @@ angular.module('flightView')
             restrict: 'E',
             controller: ['$scope', ($scope) => {
                 $scope.Math = Math;
+                $scope.headingMinor = [];
+                $scope.headingMajor = [];
+
+                let heading = $scope.telemetry.yaw.degrees;
+                let direction = ['N', 'NE', 'E', 'SE', 'S', 'SW', 'W', 'NW'];
+
+                for (let i = -500; i <= 500; i += 5) {
+                    if (Math.abs(heading - i) <= 50 && i % 45 != 0) {
+                        $scope.headingMinor.push(i);
+                    }
+                }
+
+                for (let i = -405; i <= 405; i += 45) {
+                    if (Math.abs(heading - i) <= 50) {
+                        $scope.headingMajor.push([i,
+                                direction[(i % 360 + 360) % 360 / 45]]);
+                    }
+                }
             }],
             templateUrl: './templates/status-box.html'
         }
