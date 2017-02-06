@@ -52,7 +52,7 @@ angular.module('flightView', ['ngAnimate', 'ngSanitize', 'ui.bootstrap'])
             $scope.started = false;
         };
     }])
-    .controller('DashboardController', ['$scope', '$element', '$attrs',
+    .controller('TelemetryController', ['$scope', '$element', '$attrs',
             ($scope, $element, $attrs) => {
         $scope.telemetry = telemetry;
         console.log(telemetry);
