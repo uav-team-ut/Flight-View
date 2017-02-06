@@ -1,36 +1,17 @@
-<div ng-controller="DashboardController">
-    <div class="panel panel-default" style="width: 350px" ng-controller="BatteryController">
-        <div class="panel-heading">
-            <h3 class="panel-title">Battery</h3>
+<div ng-controller="DashboardController" class="dashboard-main">
+    <div class="dashboard-right-container">
+        <fv-status-box class="dashboard-status-box"></fv-status-box>
+
+        <div class="dashboard-info-box">
+
         </div>
-        <div class="panel-body">
-            <span>
-                <div ng-controller="BatteryPercentageController">
-                    <uib-progressbar value="telemetry.battery_percentage.percent" max="max" type="{{status}}">
-                    </uib-progressbar>
-                </div>
-                <div>
-                    {{telemetry.format('%.0f', 'battery_percentage', 'percent')}}
-                </div>
-            </span>
-            <span>
-                <div ng-controller="BatteryVoltageController">
-                    <uib-progressbar value="telemetry.battery_voltage.volts" max="max" type="{{status}}">
-                    </uib-progressbar>
-                </div>
-                <div>
-                    {{telemetry.format('%.1f', 'battery_voltage', 'volts')}}
-                </div>
-            </span>
-            <span>
-                <div ng-controller="BatteryCurrentController">
-                    <uib-progressbar value="telemetry.battery_current.amps" max="max" type="{{status}}">
-                    </uib-progressbar>
-                </div>
-                <div>
-                    {{telemetry.format('%.1f', 'battery_current', 'amps')}}
-                </div>
-            </span>
+    </div>
+
+    <div class="dashboard-left-container">
+        <div class="dashboard-bottom-bar">
+
         </div>
+
+        <fv-map class="dashboard-map"></fv-map>
     </div>
 </div>

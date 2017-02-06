@@ -1,0 +1,239 @@
+<div class="status-box">
+    <div class="horizon-box">
+        <div class="ground"></div>
+
+        <div class="attitude-container">
+            <div class="attitude-box-outer">
+                <div class="attitude-box-inner"
+                        ng-style="{'-webkit-transform': 'rotate(' + telemetry.roll.degrees + 'deg)'}">
+                    <div class="attitude-box-inner"
+                            ng-style="{'-webkit-transform': 'translateY(' + telemetry.pitch.degrees * 1.7 + '%)'}">
+                        <div class="attitude-box-inner horizon"></div>
+
+                        <div ng-repeat="pitch in [-35, -25, -15, -5, 5, 15, 25, 35]">
+                            <div class="attitude-box-inner" ng-style="{top: 'calc(50% - ' + pitch * 1.7 + '%)'}"
+                                    ng-if="Math.abs(pitch - telemetry.pitch.degrees) <= 23">
+                                <div class="line pitch-marker-minor-line-left"></div>
+                                <div class="line pitch-marker-minor-line-right"></div>
+                            </div>
+                        </div>
+
+                        <div ng-repeat="pitch in [-30, -20, -10, 10, 20, 30]">
+                            <div class="attitude-box-inner" ng-style="{top: 'calc(50% - ' + pitch * 1.7 + '%)'}"
+                                    ng-if="Math.abs(pitch - telemetry.pitch.degrees) <= 23">
+                                    <div class="line pitch-marker-major-line-left"></div>
+                                    <div class="line pitch-marker-major-line-right"></div>
+                                    <div class="text-box pitch-marker-major-text">
+                                        {{pitch}}
+                                    </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="attitude-box-inner">
+                        <div class="arrow-up roll-indicator-up-arrow"></div>
+                    </div>
+                </div>
+
+                <div class="attitude-box-inner">
+                    <div class="arrow-down roll-marker-arrow"></div>
+                </div>
+
+                <div class="attitude-box-inner" style="-webkit-transform: rotate(-45deg)">
+                    <div class="circle small-circle roll-marker-circle"></div>
+                </div>
+
+                <div class="attitude-box-inner" style="-webkit-transform: rotate(-20deg)">
+                    <div class="circle small-circle roll-marker-circle"></div>
+                </div>
+
+                <div class="attitude-box-inner" style="-webkit-transform: rotate(-10deg)">
+                    <div class="circle small-circle roll-marker-circle"></div>
+                </div>
+
+                <div class="attitude-box-inner" style="-webkit-transform: rotate(10deg)">
+                    <div class="circle small-circle roll-marker-circle"></div>
+                </div>
+
+                <div class="attitude-box-inner" style="-webkit-transform: rotate(20deg)">
+                    <div class="circle small-circle roll-marker-circle"></div>
+                </div>
+
+                <div class="attitude-box-inner" style="-webkit-transform: rotate(45deg)">
+                    <div class="circle small-circle roll-marker-circle"></div>
+                </div>
+
+                <div class="attitude-box-inner" style="-webkit-transform: rotate(-60deg)">
+                    <div class="line line-thick roll-marker-line"></div>
+                </div>
+
+                <div class="attitude-box-inner" style="-webkit-transform: rotate(-30deg)">
+                    <div class="line line-thick roll-marker-line"></div>
+                </div>
+
+                <div class="attitude-box-inner" style="-webkit-transform: rotate(30deg)">
+                    <div class="line line-thick roll-marker-line"></div>
+                </div>
+
+                <div class="attitude-box-inner" style="-webkit-transform: rotate(60deg)">
+                    <div class="line line-thick roll-marker-line"></div>
+                </div>
+
+                <div class="attitude-box-inner">
+                    <div class="line pitch-indicator-left"></div>
+
+                    <div class="line pitch-indicator-right"></div>
+
+                    <div class="line pitch-indicator-bottom-left"></div>
+
+                    <div class="line pitch-indicator-bottom-right"></div>
+
+                    <div class="circle pitch-indicator-center"></div>
+                </div>
+            </div>
+        </div>
+
+        <div class="airspeed-scale">
+
+        </div>
+
+        <div class="altitude-scale">
+
+        </div>
+
+        <div class="roll-numbers">
+
+        </div>
+
+        <div class="text-box airspeed-display">
+            <div class="text-box-header">
+                AIRSPEED
+            </div>
+            <div class="text-box-number">
+                {{telemetry.format('%.0f', 'airspeed', 'knots').toUpperCase()}}
+            </div>
+        </div>
+
+        <div class="text-box altitude-msl-display">
+            <div class="text-box-header">
+                ALT MSL
+            </div>
+            <div class="text-box-number">
+                {{telemetry.format('%.0f', 'alt_msl', 'feet').toUpperCase()}}
+            </div>
+        </div>
+
+        <div class="text-box ground-speed-display">
+            <div class="text-box-header">
+                GROUND<br>SPEED
+            </div>
+            <div class="text-box-number">
+                {{telemetry.format('%.0f', 'groundspeed', 'knots').toUpperCase()}}
+            </div>
+        </div>
+
+        <div class="text-box altitude-agl-display">
+            <div class="text-box-header">
+                ALT AGL
+            </div>
+            <div class="text-box-number">
+                {{telemetry.format('%.0f', 'alt', 'feet').toUpperCase()}}
+            </div>
+        </div>
+
+        <div class="text-box pitch-display">
+            <div class="text-box-header">
+                PITCH
+            </div>
+            <div class="text-box-number">
+                {{telemetry.format('%.0f', 'pitch', 'degrees').toUpperCase()}}
+            </div>
+        </div>
+
+        <div class="text-box roll-display">
+            <div class="text-box-header">
+                ROLL
+            </div>
+            <div class="text-box-number">
+                {{telemetry.format('%.0f', 'roll', 'degrees').toUpperCase()}}
+            </div>
+        </div>
+    </div>
+
+    <div class="arrow-down arrow-heading"></div>
+
+    <div class="heading-scale">
+
+    </div>
+
+    <div class="middle-container">
+        <div></div>
+
+        <div class="text-box mode-display">
+            <div class="text-box-header">
+                MODE
+            </div>
+            <div class="text-box-number">
+                {{telemetry.mode}}
+            </div>
+        </div>
+
+        <div class="text-box heading-display">
+            <div class="text-box-header">
+                HEADING
+            </div>
+            <div class="text-box-number">
+                {{telemetry.format('%.0f', 'yaw', 'degrees').toUpperCase()}}
+            </div>
+        </div>
+
+        <div class="text-box air-time-display">
+            <div class="text-box-header">
+                AIR TIME
+            </div>
+            <div class="text-box-number">
+                {{telemetry.air_time.hhmmss}}
+            </div>
+        </div>
+
+        <div></div>
+    </div>
+
+    <div class="battery-divider">
+        <div class="battery-line">
+
+        </div>
+
+        <div class="text-box text-box-header battery-display">
+            BATTERY
+        </div>
+
+        <div class="battery-line">
+
+        </div>
+    </div>
+
+    <div class="bottom-container">
+        <div></div>
+
+        <div class="text-box battery-percentage-display">
+            <div class="text-box-number">
+                {{telemetry.format('%.0f', 'battery_percentage', 'percent').toUpperCase()}}
+            </div>
+        </div>
+
+        <div class="text-box battery-voltage-display">
+            <div class="text-box-number">
+                {{telemetry.format('%.1f', 'battery_voltage', 'volts').toUpperCase()}}
+            </div>
+        </div>
+
+        <div class="text-box battery-current-display">
+            <div class="text-box-number">
+                {{telemetry.format('%.1f', 'battery_current', 'amps').toUpperCase()}}
+            </div>
+        </div>
+
+        <div></div>
+    </div>
+</div>

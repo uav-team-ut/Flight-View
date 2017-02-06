@@ -10,6 +10,8 @@
 
         <link href="css/bootstrap.min.css" type="text/css" rel="stylesheet">
         <link href="css/flight-view.css" type="text/css" rel="stylesheet">
+        <link href="css/dashboard.css" type="text/css" rel="stylesheet">
+        <link href="css/templates/status-box.css" type="text/css" rel="stylesheet">
     </head>
 
     <body ng-app="flightView" ng-controller="FlightViewController">
@@ -59,10 +61,12 @@
         <nav class="navbar navbar-inverse navbar-fixed-left">
         </nav>
 
-        <div class="container" ng-include="openTab + '.html'"></div>
+        <div class="main-container" ng-include="openTab + '.html'"></div>
     </body>
 
     <script type="text/javascript">
+        const dashboard = require('./js/dashboard');
+
         app.coreClient.connect()
     </script>
 </html>

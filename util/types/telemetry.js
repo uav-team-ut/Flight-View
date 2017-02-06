@@ -93,6 +93,33 @@ const TELEMETRY_FIELDS = {
         verify: (wind_direction) => {
             return 0 <= wind_direction && wind_direction <= 360;
         }
+    },
+    mode: {
+        type: 'string',
+        verify: (mode) => {
+            return [
+                'MANUAL',
+                'STABILIZE',
+                'FBWA',
+                'FBWB',
+                'AUTOTUNE',
+                'TRAINING',
+                'ACRO',
+                'CRUISE',
+                'AUTO',
+                'RTL',
+                'LOITER',
+                'CIRCLE',
+                'GUIDED'
+            ].includes(mode);
+        },
+        default: 'UNKNOWN'
+    },
+    air_time: {
+        type: units.TIME,
+        verify: (time) => {
+            return time >= 0;
+        }
     }
 };
 

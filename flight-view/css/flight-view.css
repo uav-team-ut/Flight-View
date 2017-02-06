@@ -1,4 +1,4 @@
-* {
+.panel, .btn {
   border-radius: 0 !important;
 }
 
@@ -54,3 +54,11 @@
     left: 3px;
     bottom: 5px;
 }
+
+.main-container {
+    position: absolute;
+    top: 50px;
+    bottom: 0px;
+    left: 80px;
+    right: 0px;
+};
