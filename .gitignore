@@ -4,6 +4,7 @@ archive/
 current/
 fonts/
 
+.env
 *.min.*
 
 image_processing_files/

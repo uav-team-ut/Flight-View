@@ -15,7 +15,7 @@ angular.module('flightView')
                     const mapboxGL = require('mapbox-gl/dist/mapbox-gl');
                     const Map = mapboxGL.Map;
 
-                    mapboxGL.accessToken = '<mapbox api key>';
+                    mapboxGL.accessToken = process.env.FV_MAPBOX_KEY;
 
                     let map = new Map({
                         container: 'mapbox-map',
