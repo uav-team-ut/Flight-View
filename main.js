@@ -2,7 +2,11 @@ const electron = require('electron');
 const app = electron.app;
 const BrowserWindow = electron.BrowserWindow;
 
+const dotenv = require('dotenv');
+
 const core = require('./core/core');
+
+dotenv.config();
 
 app.on('ready', () => {
     let mainWindow = new BrowserWindow({

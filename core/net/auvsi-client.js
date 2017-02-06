@@ -259,9 +259,7 @@ class AUVSIClient {
     }
 
     postTargetImage(id, imageBase64, callback) {
-        // FIXME: Encode image for the server
-
-        let image = imageBase64;
+        let image = Buffer.from(imageBase64,'base64');
 
         this._request({
             method: 'POST',
@@ -281,15 +279,13 @@ class AUVSIClient {
             returns: true
         }, (body) => {
             // FIXME: Decode image back to base64
-
+            // return Buffer.from(body,'binary').toString('base64');
             return body
         }, callback);
     }
 
     putTargetImage(id, imageBase64, callback) {
-        // FIXME: Encode image for the server
-
-        let image = imageBase64;
+        let image = Buffer.from(imageBase64,'base64');
 
         this._request({
             method: 'PUT',
