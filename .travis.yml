@@ -3,10 +3,7 @@ node_js:
     - node
     - '7'
     - '6'
-    - '5'
 python:
-    - '3.3'
-    - '3.4'
     - '3.5'
 sudo: required
 dist: trusty
@@ -24,6 +21,6 @@ install:
     - npm install
     - npm install -g mocha
 script:
-    - mocha tests
+    - mocha tests --recursive
 notifications:
     email: false
