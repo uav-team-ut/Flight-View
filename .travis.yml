@@ -1,0 +1,27 @@
+language: node_js
+node_js:
+    - node
+    - '7'
+    - '6'
+python:
+    - '3.5'
+sudo: required
+dist: trusty
+services:
+    - docker
+before_install:
+    - sudo apt-get -y install python3-pip python-dev
+    - sudo pip3 install -U setuptools
+    - sudo pip3 install -U virtualenvwrapper
+    - sudo apt-get install xvfb
+install:
+    - export DISPLAY=':99.0'
+    - Xvfb :99 -screen 0 1024x768x24 > /dev/null 2>&1 &
+    - docker run -d -i -t -p 8000:80 --name interop-server auvsisuas/interop-server
+    - docker ps -a
+    - npm install
+    - npm install -g mocha
+script:
+    - mocha tests --recursive
+notifications:
+    email: false
