@@ -1,0 +1,29 @@
+language: node_js
+node_js:
+    - node
+    - '7'
+    - '6'
+    - '5'
+python:
+    - '3.3'
+    - '3.4'
+    - '3.5'
+sudo: required
+dist: trusty
+services:
+    - docker
+before_install:
+    - sudo apt-get -y install python3-pip python-dev
+    - sudo pip3 install -U setuptools
+    - sudo pip3 install -U virtualenvwrapper
+    - sudo apt-get install xvfb
+    - docker pull auvsisuas/interop-client
+install:
+    - export DISPLAY=':99.0'
+    - Xvfb :99 -screen 0 1024x768x24 > /dev/null 2>&1 &
+    - npm install
+    - npm install -g mocha
+script:
+    - mocha tests
+notifications:
+    email: false
