@@ -14,11 +14,11 @@ before_install:
     - sudo pip3 install -U setuptools
     - sudo pip3 install -U virtualenvwrapper
     - sudo apt-get install xvfb
-    - docker pull auvsisuas/interop-client
-    - docker ps -a
 install:
     - export DISPLAY=':99.0'
     - Xvfb :99 -screen 0 1024x768x24 > /dev/null 2>&1 &
+    - docker run -d -i -t -p 8000:80 --name interop-server auvsisuas/interop-server
+    - docker ps -a
     - npm install
     - npm install -g mocha
 script:
