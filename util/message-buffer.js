@@ -46,10 +46,13 @@ class MessageBuffer extends EventEmitter {
     addString(string) {
         this._newData += string
 
+        // If the data length is at least 8 characters, find how long
+        // the JSON string should be.
         if (this._newData.length >= 8) {
             this._nextLength = parseInt(this._newData.substring(0, 8))
         }
 
+        // Loop until all messages are taken off the new data string.
         while (this._nextLength &&
                 this._newData.length >= this._nextLength + 8) {
 
