@@ -1,8 +1,33 @@
 'use strict';
 
+/**
+ * Contains the MessageBuffer class.
+ *
+ * @module util/message-buffer
+ */
+
 const EventEmitter = require('events')
 
+/**
+ * Buffer that emits events when a message has been received.
+ *
+ * <p>Messages are defined as being valid JSON strings and are
+ * prefixed with an eight character string indicating the number of
+ * characters the JSON string contains.
+ *
+ * <p>
+ * Ex:
+ * <pre>
+ *    '20      {"example":"string"}'
+ * </pre>
+ *
+ * @extends EventEmitter
+ * @emits   MessageBuffer#message
+ */
 class MessageBuffer extends EventEmitter {
+    /**
+     * Create an empty MessageBuffer.
+     */
     constructor() {
         super()
 
@@ -10,6 +35,14 @@ class MessageBuffer extends EventEmitter {
         this._nextLength = 0
     }
 
+    /**
+     * Add a string to the buffer.
+     *
+     * <p>A {@link MessageBuffer#message} event will be emitted for
+     * each full message found.
+     *
+     * @param {String} string The string to be added to the buffer.
+     */
     addString(string) {
         this._newData += string
 
@@ -33,6 +66,12 @@ class MessageBuffer extends EventEmitter {
                 this._nextLength = 0
             }
 
+            /**
+             * Message event.
+             *
+             * @event MessageBuffer#Message
+             * @type  {String}
+             */
             this.emit('message', message)
         }
     }
