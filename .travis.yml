@@ -22,6 +22,6 @@ install:
     - npm install
     - npm install -g mocha
 script:
-    - mocha tests --recursive
+    - travis_retry npm test
 notifications:
     email: false

@@ -5,7 +5,8 @@
     "main": "main.js",
     "scripts": {
         "start": "electron .",
-        "postinstall": "node scripts/install-dependencies.js"
+        "postinstall": "node scripts/install-dependencies.js",
+        "test": "mocha tests --recursive"
     },
     "author": "Unmanned Aerial Vehicle Team | University of Texas at Austin",
     "license": "GPL-3.0",

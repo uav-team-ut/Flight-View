@@ -30,7 +30,7 @@ describe('AUVSIClient', function () {
 
         let stoppedAttempt = false;
 
-        let tryStart;
+        let cancel;
         let child;
 
         function connect() {
@@ -44,14 +44,11 @@ describe('AUVSIClient', function () {
 
             request.post(options, (error, response, body) => {
                 if (!error && response.statusCode === 400) {
-                    clearInterval(tryStart);
-                    stoppedAttempt = true;
+                    clearTimeout(cancel);
 
                     done();
                 } else {
-                    if (!stoppedAttempt) {
-                        setTimeout(connect, 1000);
-                    }
+                    setTimeout(connect, 1000);
                 }
             });
         };
@@ -75,18 +72,12 @@ describe('AUVSIClient', function () {
             });
         }
 
-        start();
-
-        tryStart = setInterval(() => {
-            console.log('running again');
-
-            child.kill('SIGINT');
-            stoppedAttempt = true;
-
-            setTimeout(() => {
-                start();
-            }, 2000);
+        cancel = setTimeout(() => {
+            throw new Error('Docker server did not start fast enough, it ' +
+                    'most likely stalled.');
         }, 60000);
+
+        start();
     });
 
     after(function (done) {
