@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 
 code=0
 
@@ -10,7 +10,7 @@ for i in {1..10}; do
 
     # If not code 50, the docker server not starting correctly was
     # the problem.
-    if [ $code -ne 50 ]; then
+    if [[ $code -ne 50 ]]; then
         break;
 
     # Sleep for 10 seconds and then keep trying.
