@@ -17,11 +17,11 @@ before_install:
 install:
     - export DISPLAY=':99.0'
     - Xvfb :99 -screen 0 1024x768x24 > /dev/null 2>&1 &
-    - docker run -d -i -t -p 8000:80 --name interop-server auvsisuas/interop-server
-    - docker ps -a
+    - docker pull auvsisuas/interop-server
+    - docker images
     - npm install
     - npm install -g mocha
 script:
-    - travis_retry npm test
+    - for i in {1..5}; do npm test && break || (sleep 10; docker pull auvsisuas/interop-server); done
 notifications:
     email: false
