@@ -73,8 +73,7 @@ describe('AUVSIClient', function () {
         }
 
         cancel = setTimeout(() => {
-            throw new Error('Docker server did not start fast enough, it ' +
-                    'most likely stalled.');
+            process.exit(50);
         }, 60000);
 
         start();

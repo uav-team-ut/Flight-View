@@ -22,6 +22,6 @@ install:
     - npm install
     - npm install -g mocha
 script:
-    - for i in {1..5}; do npm test && break || (sleep 10; docker pull auvsisuas/interop-server); done
+    - ./scripts/run-tests-repeat
 notifications:
     email: false
