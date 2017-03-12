@@ -22,7 +22,7 @@ const EventEmitter = require('events')
  * </pre>
  *
  * @extends EventEmitter
- * @emits   MessageBuffer#message
+ * @emits   module:util/message-buffer~MessageBuffer#message
  */
 class MessageBuffer extends EventEmitter {
     /**
@@ -69,15 +69,16 @@ class MessageBuffer extends EventEmitter {
                 this._nextLength = 0
             }
 
-            /**
-             * Message event.
-             *
-             * @event MessageBuffer#Message
-             * @type  {String}
-             */
             this.emit('message', message)
         }
     }
 }
+
+/**
+ * Message event.
+ *
+ * @event module:util/message-buffer~MessageBuffer#message
+ * @type  {String}
+ */
 
 module.exports = MessageBuffer
