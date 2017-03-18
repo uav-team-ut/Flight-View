@@ -10,8 +10,6 @@
  */
 
 const assert = require('chai').assert;
-const fs = require('fs');
-const path = require('path');
 
 describe('Database', function () {
     let Database;
@@ -20,60 +18,19 @@ describe('Database', function () {
 
     let db;
 
-    let originalPath;
-    let testPath;
+    beforeEach(function () {
+        Database = require('../core/db');
 
-    let deleteFolder;
+        let FlightViewTypes = require('../util/types');
 
-    beforeEach(function (done) {
-        originalPath = path.join(__dirname, '..', 'core/db');
-        testPath = path.join(__dirname, 'db-test');
+        Image = FlightViewTypes.Image;
+        Telemetry = FlightViewTypes.Telemetry;
 
-        if (!fs.existsSync(testPath)) {
-            fs.mkdirSync(testPath);
-        }
-
-        deleteFolder = (folderPath) => {
-            if (fs.existsSync(folderPath)) {
-                fs.readdirSync(folderPath).forEach((file) => {
-                    let currentPath = path.join(folderPath, file);
-
-                    if (fs.statSync(currentPath).isDirectory()) {
-                        deleteFolder(currentPath);
-                    } else {
-                        fs.unlinkSync(currentPath);
-                    }
-                });
-
-                fs.rmdirSync(folderPath);
-            }
-        };
-
-        let readStream = fs.createReadStream(path.join(originalPath, 'db.js'));
-        let writeStream = fs.createWriteStream(path.join(testPath, 'db.js'));
-
-        writeStream.on('close', () => {
-            Database = require('./db-test/db');
-            Image = require('../util/types/image');
-            Telemetry = require('../util/types/telemetry');
-
-
-            db = new Database(false);
-
-            done();
-        });
-
-        readStream.pipe(writeStream);
+        db = new Database(false);
     });
 
     afterEach(function (done) {
-        db.telemetry.on('compaction.done', () => {
-            deleteFolder(testPath);
-
-            done();
-        });
-
-        db.telemetry.persistence.compactDatafile();
+        setTimeout(done, 10);
     });
 
     describe('#telemetry', function () {
