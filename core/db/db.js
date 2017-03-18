@@ -13,6 +13,7 @@ const Telemetry = flightViewTypes.Telemetry;
 const CURRENT_DIR = path.join(__dirname, 'current');
 const ARCHIVE_DIR = path.join(__dirname, 'archive', dateFormat(new Date(),
         'yyyy-mm-dd HH-MM-ss'));
+const PERSISTENT_DIR = path.join(__dirname, 'persistent');
 
 class Database {
     constructor(useArchives = true) {
@@ -22,8 +23,21 @@ class Database {
 }
 
 class Datastore extends NeDBDatastore {
-    constructor(filename, useArchive, isArchive) {
-        let filePath = !isArchive ? CURRENT_DIR : ARCHIVE_DIR;
+    constructor(options) {
+        let filename = options.filename;
+        let useArchive = options['use-archive'] || false;
+        let isArchive = options['is-archive'] || false;
+        let persistent = options.persistent || false;
+
+        let filePath;
+
+        if (persistent) {
+            filePath = PERSISTENT_DIR;
+        } else if (!isArchive) {
+            filePath = CURRENT_DIR;
+        } else {
+            filePath = ARCHIVE_DIR
+        }
 
         filePath = path.join(filePath, filename);
 
@@ -32,14 +46,22 @@ class Datastore extends NeDBDatastore {
             autoload: true
         });
 
-        this.remove({}, {multi: true});
-        this.persistence.compactDatafile();
+        if (!persistent) {
+            this.remove({}, {multi: true});
+            this.persistence.compactDatafile();
+
+            this.count = 0;
+        }
 
         this.filename = filename;
-        this.count = 0;
+        this.persistent = persistent;
 
         if (useArchive && !isArchive) {
-            this._archive = new TelemetryDatastore(false, true);
+            let archiveOptions = JSON.parse(JSON.stringify(options));
+
+            archiveOptions['is-archive'] = true;
+
+            this._archive = new Datastore(archiveOptions);
         }
     }
 
@@ -114,7 +136,12 @@ class Datastore extends NeDBDatastore {
 
 class TelemetryDatastore extends Datastore {
     constructor(useArchive, isArchive) {
-        super('telemetry.db', useArchive, isArchive);
+        super({
+            filename: 'telemetry.db',
+            'use-archive': useArchive,
+            'is-archive': isArchive,
+            persistent: false
+        });
 
         this.ensureIndex({
             fieldName: 'time',
@@ -187,7 +214,12 @@ class TelemetryDatastore extends Datastore {
 
 class ImageDatastore extends Datastore {
     constructor(useArchive, isArchive) {
-        super('images.db', useArchive, isArchive);
+        super({
+            filename: 'images.db',
+            'use-archive': useArchive,
+            'is-archive': isArchive,
+            persistent: false
+        });
     }
 }
 
