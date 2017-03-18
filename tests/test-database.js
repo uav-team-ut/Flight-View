@@ -21,10 +21,10 @@ describe('Database', function () {
     beforeEach(function () {
         Database = require('../core/db');
 
-        let FlightViewTypes = require('../util/types');
+        let flightViewTypes = require('../util/types');
 
-        Image = FlightViewTypes.Image;
-        Telemetry = FlightViewTypes.Telemetry;
+        Image = flightViewTypes.Image;
+        Telemetry = flightViewTypes.Telemetry;
 
         db = new Database(false);
     });
