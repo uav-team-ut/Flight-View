@@ -5,8 +5,10 @@ const path = require('path');
 const dateFormat = require('dateformat');
 const NeDBDatastore = require('nedb');
 
-const Image = require('../../util/types/image')
-const Telemetry = require('../../util/types/telemetry');
+const FlightViewTypes = require('../../util/types');
+
+const Image = FlightViewTypes.Image;
+const Telemetry = FlightViewTypes.Telemetry;
 
 const CURRENT_DIR = path.join(__dirname, 'current');
 const ARCHIVE_DIR = path.join(__dirname, 'archive', dateFormat(new Date(),
