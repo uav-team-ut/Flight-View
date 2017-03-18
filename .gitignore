@@ -2,6 +2,7 @@
 
 archive/
 current/
+persistent/
 fonts/
 
 .env

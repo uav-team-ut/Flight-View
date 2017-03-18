@@ -35,8 +35,7 @@ class Datastore extends NeDBDatastore {
         });
 
         if (!persistent) {
-            this.remove({}, {multi: true});
-            this.persistence.compactDatafile();
+            this.clear();
 
             this.count = 0;
         }
@@ -119,6 +118,11 @@ class Datastore extends NeDBDatastore {
                 else resolve(numRemoved);
             });
         });
+    }
+
+    clear() {
+        this.remove({}, {multi: true});
+        this.persistence.compactDatafile();
     }
 }
 
