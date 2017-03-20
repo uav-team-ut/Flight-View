@@ -28,7 +28,9 @@ class MapCacheDatastore extends Datastore {
                     }
                 }
 
-                list.sort((mapCache) => mapCache.time);
+                list.sort((first, second) => {
+                    return first.time.seconds - second.time.seconds
+                });
 
                 return list;
             }
