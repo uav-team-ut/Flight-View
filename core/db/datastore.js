@@ -5,11 +5,6 @@ const path = require('path');
 const dateFormat = require('dateformat');
 const NeDBDatastore = require('nedb');
 
-const CURRENT_DIR = path.join(__dirname, 'current');
-const ARCHIVE_DIR = path.join(__dirname, 'archive', dateFormat(new Date(),
-        'yyyy-mm-dd HH-MM-ss'));
-const PERSISTENT_DIR = path.join(__dirname, 'persistent');
-
 class Datastore extends NeDBDatastore {
     constructor(options) {
         let filename = options.filename;
@@ -20,11 +15,12 @@ class Datastore extends NeDBDatastore {
         let filePath;
 
         if (persistent) {
-            filePath = PERSISTENT_DIR;
+            filePath = path.join(__dirname, '../..', '.data/db', 'persistent');
         } else if (!isArchive) {
-            filePath = CURRENT_DIR;
+            filePath = path.join(__dirname, '../..', '.data/db', 'current');
         } else {
-            filePath = ARCHIVE_DIR
+            filePath = path.join(__dirname, '../..', '.data/db', 'archive',
+                    dateFormat(new Date(), 'yyyy-mm-dd HH-MM-ss'));
         }
 
         filePath = path.join(filePath, filename);
