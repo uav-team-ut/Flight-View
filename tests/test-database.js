@@ -263,6 +263,14 @@ describe('Database', function () {
             db.mapCache.clear();
         });
 
+        after(function (done) {
+            let db = new Database();
+
+            db.mapCache.clear();
+
+            setTimeout(done, 10);
+        });
+
         describe('#insert()', function () {
             it('should return an id with valid map cache image',
                     function (done) {
