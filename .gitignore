@@ -1,8 +1,7 @@
 /node_modules/
 /docs
 
-archive/
-current/
+.data/
 fonts/
 
 .env

@@ -1,6 +1,10 @@
 'use strict';
 
+const remote = require('electron').remote;
+
 const angular = require('angular');
+
+const DashboardMap = require('./map').DashboardMap;
 
 angular.module('flightView')
     .directive('fvMap', () => {
@@ -12,14 +16,19 @@ angular.module('flightView')
             controller: ['$scope', ($scope) => {
                 $scope.$watch(() => document.getElementById('mapbox-map'),
                         () => {
-                    const mapboxGL = require('mapbox-gl/dist/mapbox-gl');
-                    const Map = mapboxGL.Map;
+                    $scope.map = new DashboardMap('mapbox-map');
 
-                    mapboxGL.accessToken = process.env.FV_MAPBOX_KEY;
-
-                    let map = new Map({
-                        container: 'mapbox-map',
-                        style: 'mapbox://styles/mapbox/satellite-v9'
+                    $scope.map.on('map-cache-request', (data) => {
+                        $scope.coreClient.send({
+                            type: 'map-cache-image',
+                            message: {
+                               zoom: data.zoom,
+                               lat_1: data.lat_1,
+                               lon_1: data.lon_1,
+                               lat_2: data.lat_2,
+                               lon_2: data.lon_2
+                            }
+                        });
                     });
                 });
             }],

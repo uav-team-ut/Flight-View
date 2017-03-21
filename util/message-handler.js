@@ -81,7 +81,7 @@ class MessageHandler extends EventEmitter {
     handleMessage(message, socket) {
         message = JSON.parse(JSON.stringify(message));
 
-        if (message.message) {
+        if (message.message && message.message.type) {
             message.type += '.' + message.message.type;
             delete message.message.type;
         }
