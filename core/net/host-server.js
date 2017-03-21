@@ -4,7 +4,7 @@ const Database = require('../db/db');
 const TCPServer = require('./base/tcp-server');
 
 class HostServer extends TCPServer {
-    constructor(port, coreServer, allowListeners = true) {
+    constructor(port, coreServer, internalSocket, allowListeners = true) {
         super(port);
 
         this._allowListeners = allowListeners;
@@ -12,6 +12,7 @@ class HostServer extends TCPServer {
         this._database = new Database();
 
         this._coreServer = coreServer;
+        this._internalSocket = internalSocket;
         this._imageCorrector = null;
         this._telemetrySender = null;
         this._listeners = [];
