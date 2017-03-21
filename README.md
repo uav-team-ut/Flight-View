@@ -1,5 +1,10 @@
 Flight&nbsp;View
 ==
+
+[![Build Status](
+    https://travis-ci.org/uav-team-ut/Flight-View.svg?branch=master)](
+    https://travis-ci.org/uav-team-ut/Flight-View)
+
 > Unmanned Aerial Vehicle Team | The University of Texas at Austin
 
 Main GUI used to display telemetry and other flight information built on

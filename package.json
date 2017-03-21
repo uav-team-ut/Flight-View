@@ -5,7 +5,9 @@
     "main": "main.js",
     "scripts": {
         "start": "electron .",
-        "postinstall": "node scripts/install-dependencies.js"
+        "postinstall": "node scripts/install-dependencies.js",
+        "test": "mocha tests --recursive",
+        "build-docs": "jsdoc flight-view core util -r -R README.md -d docs"
     },
     "author": "Unmanned Aerial Vehicle Team | University of Texas at Austin",
     "license": "GPL-3.0",
@@ -26,6 +28,7 @@
     "devDependencies": {
         "chai": "^3.5.0",
         "electron-prebuilt": "1.4.13",
+        "jsdoc": "^3.4.3",
         "mocha": "^3.2.0"
     }
 }
