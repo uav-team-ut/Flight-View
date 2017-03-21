@@ -1,5 +1,7 @@
 'use strict';
 
+const remote = require('electron').remote;
+
 const angular = require('angular');
 
 const DashboardMap = require('./map').DashboardMap;
@@ -16,7 +18,17 @@ angular.module('flightView')
                         () => {
                     $scope.map = new DashboardMap('mapbox-map');
 
-
+                    $scope.map.on('map-cache-request', (data) => {
+                        $scope.coreClient.send({
+                            type: 'map-cache-image',
+                            message: {
+                               zoom: data.zoom,
+                               lat_1: data.lat_1,
+                               lon_1: data.lon_1,
+                               lat_2: data.lat_2,
+                               lon_2: data.lon_2
+                            }
+                        });
                     });
                 });
             }],

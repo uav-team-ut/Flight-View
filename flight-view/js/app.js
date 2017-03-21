@@ -19,6 +19,8 @@ angular.module('flightView', ['ngAnimate', 'ngSanitize', 'ui.bootstrap'])
         $scope.openTab = 'dashboard';
         $scope.started = false;
 
+        $scope.coreClient = coreClient;
+
         $scope.toggleConsole = () => {
             let webContents = remote.getCurrentWebContents();
 
