@@ -2,6 +2,8 @@
 
 const angular = require('angular');
 
+const DashboardMap = require('./map').DashboardMap;
+
 angular.module('flightView')
     .directive('fvMap', () => {
         let template = '<div id="mapbox-map" style=' +
@@ -12,14 +14,9 @@ angular.module('flightView')
             controller: ['$scope', ($scope) => {
                 $scope.$watch(() => document.getElementById('mapbox-map'),
                         () => {
-                    const mapboxGL = require('mapbox-gl/dist/mapbox-gl');
-                    const Map = mapboxGL.Map;
+                    $scope.map = new DashboardMap('mapbox-map');
 
-                    mapboxGL.accessToken = process.env.FV_MAPBOX_KEY;
 
-                    let map = new Map({
-                        container: 'mapbox-map',
-                        style: 'mapbox://styles/mapbox/satellite-v9'
                     });
                 });
             }],
