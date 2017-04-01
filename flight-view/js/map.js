@@ -120,6 +120,94 @@ class DashboardMap extends MapboxMap {
         this.addSource('mapbox-satellite', satelliteSource);
         this.addLayer(satelliteLayer);
     }
+
+    drawFlyZone(auvsiMission) {
+        let flyZones = auvsiMission.fly_zones;
+        let coordinates = [[[]]];
+
+        for (let i = 0; i < flyZones.length; i++) {
+            for (let j = 0; j < flyZones[i].boundary_pts.length; j++) {
+                coordinates[i][0].push([
+                    flyZones[i].boundary_pts[j].longitude,
+                    flyZones[i].boundary_pts[j].latitude
+                ]);
+            }
+
+            coordinates[i][0].push([
+                flyZones[i].boundary_pts[0].longitude,
+                flyZones[i].boundary_pts[0].latitude
+            ]);
+        }
+
+        if (this.getLayer('fly-zone') !== undefined) {
+            this.removeLayer('fly-zone');
+        }
+
+        this.addLayer({
+            id: 'fly-zone',
+            type: 'line',
+            source: {
+                type: 'geojson',
+                data: {
+                    type: 'Feature',
+                    geometry: {
+                        type: 'MultiPolygon',
+                        coordinates: coordinates
+                    }
+                }
+            },
+            layout:{
+                'line-join': 'bevel'
+            },
+            paint: {
+                'line-color': '#ff0000',
+                'line-width': 4
+            }
+        });
+    }
+
+    drawSearchArea(auvsiMission) {
+        let searchAreas = auvsiMission.search_grid_points;
+        let coordinates = [[]];
+
+        for (let i = 0; i < searchAreas.length; i++) {
+            coordinates[0].push([
+                searchAreas[i].longitude,
+                searchAreas[i].latitude
+            ]);
+        }
+
+        coordinates[0].push([
+            searchAreas[0].longitude,
+            searchAreas[0].latitude
+        ]);
+
+        if (this.getLayer('search-area') !== undefined) {
+            this.removeLayer('search-area');
+        }
+
+        this.addLayer({
+            id: 'search-area',
+            type: 'line',
+            source: {
+                type: 'geojson',
+                data: {
+                    type: 'Feature',
+                    geometry: {
+                        type: 'Polygon',
+                        coordinates: coordinates
+                    }
+                }
+            },
+            layout:{
+                'line-join': 'bevel'
+            },
+            paint: {
+                'line-color': '#ffff00',
+                'line-width': 4
+            }
+        });
+    }
 }
 
 exports.DashboardMap = DashboardMap;
