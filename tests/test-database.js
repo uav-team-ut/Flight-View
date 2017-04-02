@@ -32,7 +32,7 @@ describe('Database', function () {
     });
 
     afterEach(function (done) {
-        setTimeout(done, 10);
+        setTimeout(done, 30);
     });
 
     describe('#telemetry', function () {
@@ -44,10 +44,6 @@ describe('Database', function () {
     describe('TelemetryDatastore', function () {
         let t1;
         let t2;
-
-        before(function () {
-            this.timeout(10);
-        });
 
         beforeEach(function () {
             t1 = new Telemetry({time: 10});
@@ -221,10 +217,6 @@ describe('Database', function () {
     describe('ImageDatastore', function () {
         let i1;
         let i2;
-
-        before(function () {
-            this.timeout(10);
-        });
 
         beforeEach(function () {
             i1 = new Image({time: 10});
