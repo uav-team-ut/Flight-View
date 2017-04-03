@@ -19,6 +19,8 @@ angular.module('flightView', ['ngAnimate', 'ngSanitize', 'ui.bootstrap'])
         $scope.openTab = 'dashboard';
         $scope.started = false;
 
+        $scope.coreClient = coreClient;
+
         $scope.toggleConsole = () => {
             let webContents = remote.getCurrentWebContents();
 
@@ -52,7 +54,7 @@ angular.module('flightView', ['ngAnimate', 'ngSanitize', 'ui.bootstrap'])
             $scope.started = false;
         };
     }])
-    .controller('DashboardController', ['$scope', '$element', '$attrs',
+    .controller('TelemetryController', ['$scope', '$element', '$attrs',
             ($scope, $element, $attrs) => {
         $scope.telemetry = telemetry;
         console.log(telemetry);
@@ -69,46 +71,4 @@ angular.module('flightView', ['ngAnimate', 'ngSanitize', 'ui.bootstrap'])
         $element.on('$destroy', () => {
             coreClient.removeListener('telemetry', eventListener);
         });
-    }])
-    .controller('BatteryController', ['$scope', ($scope) => {
-        $scope.watchStatus = ($scope, variable, warning, danger) => {
-            function getStatus(value) {
-                let status = 'success';
-
-                if (warning < danger) {
-                    if (value > danger) {
-                        status = 'danger';
-                    } else if (value > warning) {
-                        status = 'warning';
-                    }
-                } else {
-                    if (value < danger) {
-                        status = 'danger';
-                    } else if (value < warning) {
-                        status = 'warning';
-                    }
-                }
-
-                return status;
-            }
-
-            $scope.$watch(variable, () => {
-                $scope.status = getStatus($scope[variable]);
-            });
-        };
-    }])
-    .controller('BatteryPercentageController', ['$scope', ($scope) => {
-        $scope.max = 100;
-
-        $scope.watchStatus($scope, 'battery_percentage', 50, 20);
-    }])
-    .controller('BatteryVoltageController', ['$scope', ($scope) => {
-        $scope.max = 30;
-
-        $scope.watchStatus($scope, 'battery_voltage', 15, 10);
-    }])
-    .controller('BatteryCurrentController', ['$scope', ($scope) => {
-        $scope.max = 50;
-
-        $scope.watchStatus($scope, 'battery_current', 30, 40);
     }]);

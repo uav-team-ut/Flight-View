@@ -1,6 +1,10 @@
 'use strict';
 
+const remote = require('electron').remote;
+
 const angular = require('angular');
+
+const DashboardMap = require('./map').DashboardMap;
 
 angular.module('flightView')
     .directive('fvMap', () => {
@@ -12,14 +16,19 @@ angular.module('flightView')
             controller: ['$scope', ($scope) => {
                 $scope.$watch(() => document.getElementById('mapbox-map'),
                         () => {
-                    const mapboxGL = require('mapbox-gl/dist/mapbox-gl');
-                    const Map = mapboxGL.Map;
+                    $scope.map = new DashboardMap('mapbox-map');
 
-                    mapboxGL.accessToken = process.env.FV_MAPBOX_KEY;
-
-                    let map = new Map({
-                        container: 'mapbox-map',
-                        style: 'mapbox://styles/mapbox/satellite-v9'
+                    $scope.map.on('map-cache-request', (data) => {
+                        $scope.coreClient.send({
+                            type: 'map-cache-image',
+                            message: {
+                               zoom: data.zoom,
+                               lat_1: data.lat_1,
+                               lon_1: data.lon_1,
+                               lat_2: data.lat_2,
+                               lon_2: data.lon_2
+                            }
+                        });
                     });
                 });
             }],
@@ -31,6 +40,24 @@ angular.module('flightView')
             restrict: 'E',
             controller: ['$scope', ($scope) => {
                 $scope.Math = Math;
+                $scope.headingMinor = [];
+                $scope.headingMajor = [];
+
+                let heading = $scope.telemetry.yaw.degrees;
+                let direction = ['N', 'NE', 'E', 'SE', 'S', 'SW', 'W', 'NW'];
+
+                for (let i = -500; i <= 500; i += 5) {
+                    if (Math.abs(heading - i) <= 50 && i % 45 != 0) {
+                        $scope.headingMinor.push(i);
+                    }
+                }
+
+                for (let i = -405; i <= 405; i += 45) {
+                    if (Math.abs(heading - i) <= 50) {
+                        $scope.headingMajor.push([i,
+                                direction[(i % 360 + 360) % 360 / 45]]);
+                    }
+                }
             }],
             templateUrl: './templates/status-box.html'
         }

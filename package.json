@@ -19,6 +19,7 @@
         "dateformat": "^2.0.0",
         "dotenv": "^4.0.0",
         "download-git-repo": "^0.2.1",
+        "jimp": "^0.2.27",
         "mapbox-gl": "^0.31.0",
         "nedb": "^1.8.0",
         "node-ipc": "^8.10.2",

@@ -11,6 +11,7 @@
         <link href="css/bootstrap.min.css" type="text/css" rel="stylesheet">
         <link href="css/flight-view.css" type="text/css" rel="stylesheet">
         <link href="css/dashboard.css" type="text/css" rel="stylesheet">
+        <link href="css/target-view.css" type="text/css" rel="stylesheet">
         <link href="css/templates/status-box.css" type="text/css" rel="stylesheet">
     </head>
 
@@ -59,6 +60,37 @@
         </nav>
 
         <nav class="navbar navbar-inverse navbar-fixed-left">
+            <ul class="nav navbar-nav">
+                <li>
+                    <button type="button" class="btn btn-default navbar-btn btn-lg" ng-click="openTab='dashboard'">
+                        <span class="glyphicon glyphicon-dashboard"></span>
+                    </button>
+                </li>
+
+                <li>
+                    <button type="button" class="btn btn-default navbar-btn btn-lg" ng-click="openTab='live-video'">
+                        <span class="glyphicon glyphicon-facetime-video"></span>
+                    </button>
+                </li>
+
+                <li>
+                    <button type="button" class="btn btn-default navbar-btn btn-lg" ng-click="openTab='target-view'">
+                        <span class="glyphicon glyphicon-screenshot"></span>
+                    </button>
+                </li>
+
+                <li>
+                    <button type="button" class="btn btn-default navbar-btn btn-lg" ng-click="openTab='task-list'">
+                        <span class="glyphicon glyphicon-list-alt"></span>
+                    </button>
+                </li>
+
+                <li>
+                    <button type="button" class="btn btn-default navbar-btn btn-lg" ng-click="openTab='settings'">
+                        <span class="glyphicon glyphicon-cog"></span>
+                    </button>
+                </li>
+            </ul>
         </nav>
 
         <div class="main-container" ng-include="openTab + '.html'"></div>
@@ -66,6 +98,7 @@
 
     <script type="text/javascript">
         const dashboard = require('./js/dashboard');
+        const targetView = require('./js/target-view');
 
         app.coreClient.connect()
     </script>
