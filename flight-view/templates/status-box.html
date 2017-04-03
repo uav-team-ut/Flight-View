@@ -162,8 +162,22 @@
 
     <div class="arrow-down arrow-heading"></div>
 
-    <div class="heading-scale">
+    <div class="heading-scale"
+            ng-style="{'-webkit-transform': 'translateX(' + telemetry.yaw.degrees * -1 + '%)'}">
+        <div ng-repeat="i in headingMinor">
+            <div class="line heading-line-minor"
+                    ng-style="{left: i + 50 + '%'}"></div>
+        </div>
 
+        <div ng-repeat="i in headingMajor">
+            <div class="heading-major" ng-style="{left: i[0] + 50 + '%'}">
+                <div class="line heading-line-major"></div>
+
+                <div class="heading-marker-major-text">
+                    {{i[1]}}
+                </div>
+            </div>
+        </div>
     </div>
 
     <div class="middle-container">
@@ -200,17 +214,13 @@
     </div>
 
     <div class="battery-divider">
-        <div class="battery-line">
-
-        </div>
+        <div class="battery-line"></div>
 
         <div class="text-box text-box-header battery-display">
             BATTERY
         </div>
 
-        <div class="battery-line">
-
-        </div>
+        <div class="battery-line"></div>
     </div>
 
     <div class="bottom-container">

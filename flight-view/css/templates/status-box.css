@@ -1,4 +1,5 @@
 .status-box {
+    overflow: hidden;
     background-color: #2e2e2e;
     color: white;
     min-height: 150px;
@@ -283,8 +284,37 @@
 }
 
 .heading-scale {
+    margin-left: 13px;
+    margin-right: 13px;
+    padding-right: 5%;
     height: 25px;
-    background-color: #555555;
+    position: relative;
+}
+
+.heading-line-minor {
+    -webkit-transform: translateX(-50%);
+    height: 10px;
+    top: 0px;
+    position: absolute;
+}
+
+.heading-major {
+    position: absolute;
+    top: 0px;
+    bottom: 0px;
+}
+
+.heading-line-major {
+    -webkit-transform: translateX(-50%);
+    height: 15px;
+    top: 0px;
+    position: absolute;
+}
+
+.heading-marker-major-text {
+    display: inline-block;
+    font-size: 12px;
+    -webkit-transform: translate(-50%, 14px);
 }
 
 .middle-container {
