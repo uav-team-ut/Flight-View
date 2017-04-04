@@ -67,5 +67,3 @@ module.exports = class HostServer extends EventEmitter {
         return this._app.locals.telemetry;
     }
 }
-
-let thing = new HostServer(null, null, false)
