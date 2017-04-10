@@ -12,7 +12,7 @@ let coreClient = new IPCClient('flight-view', 'core');
 
 exports.coreClient = coreClient;
 
-let telemetry = new Telemetry();
+let default_telemetry = new Telemetry({}, {filled: true});
 
 angular.module('flightView', ['ngAnimate', 'ngSanitize', 'ui.bootstrap'])
     .controller('FlightViewController', ['$scope', ($scope) => {
@@ -36,7 +36,7 @@ angular.module('flightView', ['ngAnimate', 'ngSanitize', 'ui.bootstrap'])
                 type: 'start',
                 message: {
                     type: 'solo',
-                    port: 25000
+                    message: null
                 }
             });
 
@@ -56,17 +56,28 @@ angular.module('flightView', ['ngAnimate', 'ngSanitize', 'ui.bootstrap'])
     }])
     .controller('TelemetryController', ['$scope', '$element', '$attrs',
             ($scope, $element, $attrs) => {
-        $scope.telemetry = telemetry;
-        console.log(telemetry);
+        $scope.telemetry = default_telemetry;
 
         function eventListener(message) {
-            telemetry = Telemetry.deserialize(message);
-            $scope.telemetry = telemetry;
+            let new_telemetry = Telemetry.deserialize(message);
+
+            let doc = new_telemetry.toDocument();
+            let newFields = {};
+
+            for (let field in doc) {
+                if (doc.hasOwnProperty(field)) {
+                    if (doc[field] !== undefined) {
+                        newFields[field] = doc[field];
+                    }
+                }
+            }
+
+            $scope.telemetry.add(newFields);
 
             $scope.$apply();
         }
 
-        coreClient.on('telemetry', eventListener);
+        coreClient.onMessage('telemetry', eventListener);
 
         $element.on('$destroy', () => {
             coreClient.removeListener('telemetry', eventListener);
