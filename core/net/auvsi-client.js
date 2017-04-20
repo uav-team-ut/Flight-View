@@ -42,6 +42,13 @@ class AUVSIClient {
         return this._url;
     }
 
+    logout() {
+        this._loggedIn = false;
+        this._url = NOT_LOGGED_IN;
+
+        req = request.defaults({jar: true});
+    }
+
     _request(options, action, callback) {
         if (callback === undefined) {
             callback = action;
