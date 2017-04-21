@@ -4,7 +4,7 @@
 # Takes a fixture file (.yaml) and loads in into the interop docker.
 # 2nd arg (optional) is docker image name; defaults to "interop-server"
 # Assumes docker is installed and the interop-server docker exists. 
-# Updated April 16th, 2017											
+# Updated April 21th, 2017											
 #######################################################################
 
 # Global Variables:
@@ -113,7 +113,7 @@ function fin
 }
 
 checkInputs "${@}" && \
-startInteropDocker && \
+#startInteropDocker && \
 copyFileToDocker && \
 loadFixtures
 
