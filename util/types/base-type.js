@@ -77,7 +77,9 @@ class BaseType {
                 if (fieldProperties.unit.hasOwnProperty(key)) {
                     Object.defineProperty(newField, key, {
                         get: () => {
-                            if (fieldProperties.unit[key].default) {
+                            if (fieldProperties.value === undefined) {
+                                return undefined;
+                            } else if (fieldProperties.unit[key].default) {
                                 return fieldProperties.value;
                             } else {
                                 return fieldProperties.unit[key].convertTo(
