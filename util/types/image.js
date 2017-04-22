@@ -4,6 +4,12 @@ const BaseType = require('./base-type');
 const units = require('./units');
 
 const IMAGE_FIELDS = {
+    time: {
+        type: units.TIME,
+        verify: (time) => {
+            return time >= 0;
+        }
+    },
     file_original: {
         type: 'string',
         default: ''
