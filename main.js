@@ -4,7 +4,7 @@ const BrowserWindow = electron.BrowserWindow;
 
 const dotenv = require('dotenv');
 
-const core = require('./core/core');
+const core = require('./core');
 
 dotenv.config();
 
