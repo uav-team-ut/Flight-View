@@ -28,11 +28,10 @@ coreServer.onMessage('start.solo', (message, socket) => {
 coreServer.onMessage('stop', (message, socket) => {
     console.log('Stopping.');
 
-    activeServer.stopListening();
+    activeServer.close();
 });
 
-coreServer.onMessage('map-cache-image',
-        (message, socket) => {
+coreServer.onMessage('map-cache-image', (message, socket) => {
     mapboxStatic.downloadRange(message.zoom, message.lat_1, message.lon_1,
             message.lat_2, message.lon_2, (err) => {
         if (err) {
