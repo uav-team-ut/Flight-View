@@ -6,4 +6,9 @@ npm install sprintf-js --save
 npm install node-ipc --save
 npm install jimp --save
 npm install mapbox-gl --save
-
+npm install angular --save
+npm install angular-animate --save
+npm install angular-sanitize --save
+npm install angular-ui-bootstrap --save
+npm install download-git-repo --save
+npm install request --save
