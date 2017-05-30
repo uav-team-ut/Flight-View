@@ -42,6 +42,7 @@ angular.module('flightView', ['ngAnimate', 'ngSanitize', 'ui.bootstrap'])
 
             // TODO: Verify that the server started successfully
             $scope.started = true;
+            $scope.canLogIn = true;
         };
 
         $scope.stop = () => {
@@ -52,7 +53,32 @@ angular.module('flightView', ['ngAnimate', 'ngSanitize', 'ui.bootstrap'])
 
             // TODO: Verify that the server stopped successfully
             $scope.started = false;
+            $scope.canLogIn = false;
         };
+
+        $scope.canLogIn = false;
+
+        $scope.loginInterop = (url, username, password) => {
+            coreClient.send({
+                type: 'login.request',
+                message: {
+                    url: url,
+                    username: username,
+                    password: password
+                }
+            });
+        };
+
+        coreClient.onMessage('login.fail', (message) => {
+            console.log(message);
+        });
+
+        coreClient.onMessage('login.success', (message) => {
+            $scope.canLogIn = false;
+            $scope.loggedIn = true;
+
+            $scope.$apply();
+        });
     }])
     .controller('TelemetryController', ['$scope', '$element', '$attrs',
             ($scope, $element, $attrs) => {

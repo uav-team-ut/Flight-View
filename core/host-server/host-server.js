@@ -43,7 +43,17 @@ module.exports = class HostServer extends EventEmitter {
         this._app.locals.targets = Targets(this);
         this._app.locals.telemetry = Telemetry(this);
 
-        this._handleLogin = (message, socket) => {
+        this._listeners = {};
+        this._intervals = [];
+
+        this._listeners.handleLogin = (message, socket) => {
+            // FIXME: Currently pulling login details from
+            // environment variables since GUI cannot specify.
+
+            message.url = process.env.FV_INTEROP_URL;
+            message.username = process.env.FV_INTEROP_USERNAME;
+            message.password = process.env.FV_INTEROP_PASSWORD;
+
             this.auvsiClient.login(message.url, message.username,
                     message.password, (error) => {
                 if (error !== null) {
@@ -59,11 +69,42 @@ module.exports = class HostServer extends EventEmitter {
                             username: message.username
                         }
                     });
+
+                    let broadcastMission = (callback) => {
+                        if (typeof callback != 'function') {
+                            callback = () => {};
+                        }
+
+                        this.auvsiClient.getMissions((error, missions) => {
+                            if (error) {
+                                callback(error);
+                                return;
+                            }
+
+                            for (let i = 0; i < missions.length; i++) {
+                                let mission = missions[i];
+
+                                if (mission.active === true) {
+                                    this.broadcast({
+                                        type: 'interop-mission',
+                                        message: mission
+                                    });
+
+                                    break;
+                                }
+                            }
+
+                            callback(null);
+                        });
+                    };
+
+                    broadcastMission();
                 }
-            })
+            });
         };
 
-        this.coreServer.onMessage('login.request', this._handleLogin);
+        this.coreServer.onMessage('login.request',
+                this._listeners.handleLogin);
     }
 
     listen() {
@@ -73,7 +114,14 @@ module.exports = class HostServer extends EventEmitter {
     close() {
         this._httpServer.close();
 
-        this.coreSocket.removeListener('login', this._handleLogin);
+        this.coreSocket.removeListener('login.request',
+                this._listeners.handleLogin);
+
+        for (let interval in this._intervals) {
+            if (this._intervals.hasOwnProperty(interval)) {
+                clearInterval(interval);
+            }
+        }
     }
 
     broadcast(message) {

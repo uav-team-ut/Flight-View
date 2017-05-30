@@ -64,6 +64,10 @@ class DashboardMap extends MapboxMap {
 
         this.dragRotate.disable();
 
+        this._makeContextMenu();
+    }
+
+    _makeContextMenu() {
         let mapGeneralMenu = new Menu();
 
         mapGeneralMenu.append(new MenuItem({
@@ -121,92 +125,98 @@ class DashboardMap extends MapboxMap {
         this.addLayer(satelliteLayer);
     }
 
-    drawFlyZone(auvsiMission) {
-        let flyZones = auvsiMission.fly_zones;
-        let coordinates = [[[]]];
+    setInteropMission(mission) {
+        let flyZones = mission.fly_zones;
+        let flyZoneCoordinates = [[[]]];
 
         for (let i = 0; i < flyZones.length; i++) {
             for (let j = 0; j < flyZones[i].boundary_pts.length; j++) {
-                coordinates[i][0].push([
+                flyZoneCoordinates[i][0].push([
                     flyZones[i].boundary_pts[j].longitude,
                     flyZones[i].boundary_pts[j].latitude
                 ]);
             }
 
-            coordinates[i][0].push([
+            flyZoneCoordinates[i][0].push([
                 flyZones[i].boundary_pts[0].longitude,
                 flyZones[i].boundary_pts[0].latitude
             ]);
         }
 
-        if (this.getLayer('fly-zone') !== undefined) {
-            this.removeLayer('fly-zone');
-        }
-
-        this.addLayer({
-            id: 'fly-zone',
-            type: 'line',
-            source: {
-                type: 'geojson',
-                data: {
-                    type: 'Feature',
-                    geometry: {
-                        type: 'MultiPolygon',
-                        coordinates: coordinates
-                    }
-                }
-            },
-            layout:{
-                'line-join': 'bevel'
-            },
-            paint: {
-                'line-color': '#ff0000',
-                'line-width': 4
-            }
-        });
-    }
-
-    drawSearchArea(auvsiMission) {
-        let searchAreas = auvsiMission.search_grid_points;
-        let coordinates = [[]];
+        let searchAreas = mission.search_grid_points;
+        let searchAreaCoordinates = [[]];
 
         for (let i = 0; i < searchAreas.length; i++) {
-            coordinates[0].push([
+            searchAreaCoordinates[0].push([
                 searchAreas[i].longitude,
                 searchAreas[i].latitude
             ]);
         }
 
-        coordinates[0].push([
-            searchAreas[0].longitude,
-            searchAreas[0].latitude
-        ]);
-
-        if (this.getLayer('search-area') !== undefined) {
-            this.removeLayer('search-area');
+        if (searchAreas.length > 0) {
+            searchAreaCoordinates[0].push([
+                searchAreas[0].longitude,
+                searchAreas[0].latitude
+            ]);
         }
 
-        this.addLayer({
-            id: 'search-area',
-            type: 'line',
-            source: {
-                type: 'geojson',
-                data: {
-                    type: 'Feature',
-                    geometry: {
-                        type: 'Polygon',
-                        coordinates: coordinates
-                    }
-                }
-            },
-            layout:{
-                'line-join': 'bevel'
-            },
-            paint: {
-                'line-color': '#ffff00',
-                'line-width': 4
+        let flyZoneData = {
+            type: 'Feature',
+            geometry: {
+                type: 'MultiPolygon',
+                coordinates: flyZoneCoordinates
             }
-        });
+        };
+
+        let searchAreaData = {
+            type: 'Feature',
+            geometry: {
+                type: 'Polygon',
+                coordinates: searchAreaCoordinates
+            }
+        };
+
+        if (this.getSource('fly-zone') === undefined) {
+            this.addSource('fly-zone', {
+                type: 'geojson', data: flyZoneData
+            });
+
+            this.addLayer({
+                id: 'fly-zone',
+                type: 'line',
+                source: 'fly-zone',
+                layout: {
+                    'line-join': 'bevel'
+                },
+                paint: {
+                    'line-color': '#ff0000',
+                    'line-width': 4
+                }
+            });
+        } else {
+            this.getSource('fly-zone').setData(flyZoneData);
+        }
+
+        if (this.getSource('search-area') === undefined) {
+            this.addSource('search-area', {
+                type: 'geojson', data: searchAreaData
+            });
+
+            this.addLayer({
+                id: 'search-area',
+                type: 'line',
+                source: 'search-area',
+                layout:  {
+                    'line-join': 'bevel'
+                },
+                paint: {
+                    'line-color': '#ffff00',
+                    'line-width': 4
+                }
+            });
+        } else {
+            this.getSource('fly-zone').setData(flyZoneData);
+        }
     }
 }
 

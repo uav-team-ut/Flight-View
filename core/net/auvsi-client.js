@@ -118,6 +118,7 @@ class AUVSIClient {
                 username: username,
                 password: password
             },
+            timeout: 1000,
             returns: false
         }, (body) => {
             this._loggedIn = true;

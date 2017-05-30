@@ -13,13 +13,15 @@ angular.module('flightView')
 
         return {
             restrict: 'E',
-            controller: ['$scope', ($scope) => {
+            controller: ['$scope', '$element', ($scope, $element) => {
+                let coreClient = $scope.coreClient;
+
                 $scope.$watch(() => document.getElementById('mapbox-map'),
                         () => {
                     $scope.map = new DashboardMap('mapbox-map');
 
                     $scope.map.on('map-cache-request', (data) => {
-                        $scope.coreClient.send({
+                        coreClient.send({
                             type: 'map-cache-image',
                             message: {
                                zoom: data.zoom,
@@ -30,6 +32,17 @@ angular.module('flightView')
                             }
                         });
                     });
+                });
+
+                function missionListener(message) {
+                    $scope.map.setInteropMission(message);
+                }
+
+                coreClient.onMessage('interop-mission', missionListener);
+
+                $element.on('$destroy', () => {
+                    coreClient.removeListener('interop-mission',
+                            missionListener);
                 });
             }],
             template: template
