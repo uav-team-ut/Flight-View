@@ -98,7 +98,36 @@ module.exports = class HostServer extends EventEmitter {
                         });
                     };
 
+                    let broadcastObstacles = (callback) => {
+                        if (typeof callback != 'function') {
+                            callback = () => {};
+                        }
+
+                        this.auvsiClient.getObstacles((error, obstacles) => {
+                            if (error) {
+                                callback(error);
+                                return;
+                            }
+
+                            this.broadcast({
+                                type: 'obstacles',
+                                message: obstacles
+                            });
+
+                            callback(null);
+                        });
+                    }
+
                     broadcastMission();
+                    broadcastObstacles();
+
+                    this._intervals.push(setInterval(() => {
+                        broadcastMission();
+                    }), 500);
+
+                    this._intervals.push(setInterval(() => {
+                        broadcastObstacles();
+                    }), 100);
                 }
             });
         };
@@ -111,17 +140,21 @@ module.exports = class HostServer extends EventEmitter {
         this._httpServer = this._app.listen(this._port);
     }
 
+    _cancelIntervals() {
+        for (let interval in this._intervals) {
+            if (this._intervals.hasOwnProperty(interval)) {
+                clearInterval(interval);
+            }
+        }
+    }
+
     close() {
         this._httpServer.close();
 
         this.coreSocket.removeListener('login.request',
                 this._listeners.handleLogin);
 
-        for (let interval in this._intervals) {
-            if (this._intervals.hasOwnProperty(interval)) {
-                clearInterval(interval);
-            }
-        }
+        this._cancelIntervals();
     }
 
     broadcast(message) {

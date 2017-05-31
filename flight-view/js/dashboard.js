@@ -44,6 +44,17 @@ angular.module('flightView')
                     coreClient.removeListener('interop-mission',
                             missionListener);
                 });
+
+                function obstacleListener(message) {
+                    $scope.map.setObstacles(message);
+                }
+
+                coreClient.onMessage('obstacles', obstacleListener);
+
+                $element.on('$destroy', () => {
+                    coreClient.removeListener('obstacles',
+                            obstacleListener);
+                });
             }],
             template: template
         }
