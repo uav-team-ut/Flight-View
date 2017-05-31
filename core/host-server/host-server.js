@@ -5,6 +5,8 @@ const EventEmitter = require('events');
 const express = require('express');
 const bodyParser = require('body-parser');
 
+const whilst = require('async/whilst');
+
 const AUVSIClient = require('../net/auvsi-client');
 const Database = require('../db');
 
@@ -44,7 +46,6 @@ module.exports = class HostServer extends EventEmitter {
         this._app.locals.telemetry = Telemetry(this);
 
         this._listeners = {};
-        this._intervals = [];
 
         this._listeners.handleLogin = (message, socket) => {
             // FIXME: Currently pulling login details from
@@ -118,16 +119,17 @@ module.exports = class HostServer extends EventEmitter {
                         });
                     }
 
-                    broadcastMission();
-                    broadcastObstacles();
-
-                    this._intervals.push(setInterval(() => {
+                    whilst(() => this.auvsiClient.loggedIn, (callback) => {
                         broadcastMission();
-                    }), 500);
 
-                    this._intervals.push(setInterval(() => {
+                        setTimeout(() => callback(null, callback), 500);
+                    });
+
+                    whilst(() => this.auvsiClient.loggedIn, (callback) => {
                         broadcastObstacles();
-                    }), 100);
+
+                        setTimeout(() => callback(null, callback), 100);
+                    });
                 }
             });
         };
@@ -140,21 +142,13 @@ module.exports = class HostServer extends EventEmitter {
         this._httpServer = this._app.listen(this._port);
     }
 
-    _cancelIntervals() {
-        for (let interval in this._intervals) {
-            if (this._intervals.hasOwnProperty(interval)) {
-                clearInterval(interval);
-            }
-        }
-    }
-
     close() {
         this._httpServer.close();
 
+        this.auvsiClient.logout();
+
         this.coreSocket.removeListener('login.request',
                 this._listeners.handleLogin);
-
-        this._cancelIntervals();
     }
 
     broadcast(message) {
