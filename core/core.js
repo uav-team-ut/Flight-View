@@ -43,3 +43,11 @@ coreServer.onMessage('map-cache-image', (message, socket) => {
 });
 
 coreServer.listen();
+
+module.exports = {
+    cleanup() {
+        if (activeServer !== null) {
+            activeServer.close();
+        }
+    }
+};

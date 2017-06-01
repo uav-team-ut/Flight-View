@@ -24,3 +24,7 @@ app.on('ready', () => {
         mainWindow.show();
     });
 });
+
+app.on('quit', () => {
+    core.cleanup();
+});
