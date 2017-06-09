@@ -3,52 +3,40 @@
 const express = require('express');
 
 const parsers = require('../parsers');
+const helpers = require('./helpers');
 
-//const angular = require('angular');
+const Image = require('../../../util/types').Image;
+
 let router = express.Router();
 
 router.get('/', (req, res) => {
-    // Return all images
-    // add some options, like unprocessed
-    let img_limit=req.query.count;
-    let processed=req.query.processed;
-    let processed_manual=req.query.processed_manual;
-    if(typeof processed != undefined &&processed==true){
-        if(typeof img_limit != undefined){
-          res.send(req.app.locals.images.getUnprocessed(img_limit));
-        }
-        else
-        {
-          res.send(req.app.locals.images.getUnprocessed());
-        }
+    let checkQuery = helpers.QueryChecker(req);
+
+    let limit = checkQuery('limit', (value) => parseInt(value));
+    let processed = checkQuery('processed', (value) => value == 'true');
+    let processedManual = checkQuery('processed_manual',
+            (value) => value == 'true');
+
+    let func;
+    let imagesFunc = req.app.locals.images;
+
+    if (processed === false) {
+        func = imagesFunc.getUnprocessed;
+    } else if (processedManual === false) {
+        func = imagesFunc.getUnprocessedManual;
+    } else {
+        func = imagesFunc.get;
     }
-    else if(typeof processed_manual != undefined&&processed_manual==true){
-        if(typeof img_limit != undefined){
-          res.send(req.app.locals.images.getUnprocessed(img_limit));
-        }
-        else
-        {
-          res.send(req.app.locals.images.getUnprocessed());
-        }
-    }
-    else{
-        if(typeof img_limit != undefined){
-          res.send(req.app.locals.images.getUnprocessed(img_limit));
-        }
-        else
-        {
-          res.send(req.app.locals.images.getUnprocessed());
-        }
-    }
+
+    func(limit).then((images) => res.send(images))
+        .catch(helpers.sendError(res));
 });
 
 router.post('/', parsers.json, (req, res) => {
-    // Post a new image
-    let img = new Image(req.body);
+    let image = new Image(req.body);
 
-    req.app.locals.image.add(img);
-
-    res.sendStatus(201);
+    req.app.locals.images.add(image).then(() => res.sendStatus(201))
+        .catch(helpers.sendError(res));
 });
 
 router.get('/:id', (req, res) => {

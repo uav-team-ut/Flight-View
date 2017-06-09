@@ -45,6 +45,10 @@ const IMAGE_FIELDS = {
     processed: {
         type: 'boolean',
         default: false
+    },
+    processed_manual: {
+        type: 'boolean',
+        default: false
     }
 };
 
