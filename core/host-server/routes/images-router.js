@@ -14,30 +14,30 @@ router.get('/', (req, res) => {
     let processed=req.query.processed;
     let processed_manual=req.query.processed_manual;
     if(angular.equals({},processed)==false&&processed==true){
-      if(angular.equals({},img_limit)==false){
-        res.send(req.app.locals.images.getUnprocessed(img_limit);
-      }
-      else
-      {
-        res.send(req.app.locals.images.getUnprocessed();
-      }
-    }
-    else if(angular.equals({},processed_manual)==false&&processed_manual==true){
         if(angular.equals({},img_limit)==false){
-          res.send(req.app.locals.images.getUnprocessed(img_limit);
+          res.send(req.app.locals.images.getUnprocessed(img_limit));
         }
         else
         {
-          res.send(req.app.locals.images.getUnprocessed();
+          res.send(req.app.locals.images.getUnprocessed());
+        }
+    }
+    else if(angular.equals({},processed_manual)==false&&processed_manual==true){
+        if(angular.equals({},img_limit)==false){
+          res.send(req.app.locals.images.getUnprocessed(img_limit));
+        }
+        else
+        {
+          res.send(req.app.locals.images.getUnprocessed());
         }
     }
     else{
         if(angular.equals({},img_limit)==false){
-          res.send(req.app.locals.images.getUnprocessed(img_limit);
+          res.send(req.app.locals.images.getUnprocessed(img_limit));
         }
         else
         {
-          res.send(req.app.locals.images.getUnprocessed();
+          res.send(req.app.locals.images.getUnprocessed());
         }
     }
 });
@@ -60,3 +60,4 @@ router.put('/:id', parsers.json, (req, res) => {
 });
 
 module.exports = router;
+
