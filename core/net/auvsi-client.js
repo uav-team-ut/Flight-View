@@ -75,7 +75,7 @@ class AUVSIClient {
 
         options.url = (options.hasOwnProperty('url') ? options.url : this.url)
             + options.uri;
-
+            
         delete options.returns;
         delete options.uri;
 

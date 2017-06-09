@@ -76,7 +76,7 @@ angular.module('flightView', ['ngAnimate', 'ngSanitize', 'ui.bootstrap'])
         coreClient.onMessage('login.success', (message) => {
             $scope.canLogIn = false;
             $scope.loggedIn = true;
-
+            console.log("Success");
             $scope.$apply();
         });
     }])

@@ -13,8 +13,8 @@ router.get('/', (req, res) => {
     let img_limit=req.query.count;
     let processed=req.query.processed;
     let processed_manual=req.query.processed_manual;
-    if(processed.length==0&&processed==true){
-        if(img_limit.length==0){
+    if(typeof processed != undefined &&processed==true){
+        if(typeof img_limit != undefined){
           res.send(req.app.locals.images.getUnprocessed(img_limit));
         }
         else
@@ -22,8 +22,8 @@ router.get('/', (req, res) => {
           res.send(req.app.locals.images.getUnprocessed());
         }
     }
-    else if(processed_manual.length==0&&processed_manual.length==0){
-        if(img_limit.length==0){
+    else if(typeof processed_manual != undefined&&processed_manual==true){
+        if(typeof img_limit != undefined){
           res.send(req.app.locals.images.getUnprocessed(img_limit));
         }
         else
@@ -32,7 +32,7 @@ router.get('/', (req, res) => {
         }
     }
     else{
-        if(img_limit.length==0){
+        if(typeof img_limit != undefined){
           res.send(req.app.locals.images.getUnprocessed(img_limit));
         }
         else

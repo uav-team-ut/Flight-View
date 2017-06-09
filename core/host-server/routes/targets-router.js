@@ -15,21 +15,28 @@ router.get('/', (req, res) => {
 
 router.post('/', parsers.json, (req, res) => {
     let targetNoData = req.body;
-
+  //  console.log(targetNoData.data);
+  //  console.log(targetNoData.type);
+  //  console.log(req.get('content-type'));
+    let targetData=req.body.data;
     if (targetNoData.hasOwnProperty('data')) {
         delete targetNoData.data;
     }
+    console.log(targetData);
+    console.log(targetNoData);
 
     req.app.locals.auvsiClient.postTarget(targetNoData, (error, target) => {
         if (error) {
+            console.log(error);
             res.sendStatus(500);
-        } else if (req.body.hasOwnProperty('data')) {
-            req.app.locals.auvsiClient.putTargetImage(target.id, req.body.data,
+        } else if (targetData!=undefined) {
+            req.app.locals.auvsiClient.putTargetImage(target.id, targetData,
                     (error) => {
                 if (error) res.sendStatus(500);
                 else res.sendStatus(200);
             });
         } else {
+          console.log(targetData);
             res.sendStatus(200);
         };
     });

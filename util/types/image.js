@@ -10,11 +10,11 @@ const IMAGE_FIELDS = {
             return time >= 0;
         }
     },
-    file_original: {
+    data_original: {
         type: 'string',
         default: ''
     },
-    file_warped: {
+    data_warped: {
         type: 'string',
         default: ''
     },

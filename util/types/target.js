@@ -5,6 +5,10 @@ const targetCharacteristics = require('./target-characteristics');
 const units = require('./units');
 
 const STANDARD_TARGET_FIELDS = {
+    type:{
+      type: 'string',
+      default: 'standard'
+    },
     file: {
         type: 'string',
         default: ''
