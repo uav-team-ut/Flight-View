@@ -4,7 +4,7 @@ const BrowserWindow = electron.BrowserWindow;
 
 const dotenv = require('dotenv');
 
-const core = require('./core/core');
+const core = require('./core');
 
 dotenv.config();
 
@@ -23,4 +23,8 @@ app.on('ready', () => {
     mainWindow.once('ready-to-show', () => {
         mainWindow.show();
     });
+});
+
+app.on('quit', () => {
+    core.cleanup();
 });

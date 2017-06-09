@@ -13,13 +13,15 @@ angular.module('flightView')
 
         return {
             restrict: 'E',
-            controller: ['$scope', ($scope) => {
+            controller: ['$scope', '$element', ($scope, $element) => {
+                let coreClient = $scope.coreClient;
+
                 $scope.$watch(() => document.getElementById('mapbox-map'),
                         () => {
                     $scope.map = new DashboardMap('mapbox-map');
 
                     $scope.map.on('map-cache-request', (data) => {
-                        $scope.coreClient.send({
+                        coreClient.send({
                             type: 'map-cache-image',
                             message: {
                                zoom: data.zoom,
@@ -31,6 +33,28 @@ angular.module('flightView')
                         });
                     });
                 });
+
+                function missionListener(message) {
+                    $scope.map.setInteropMission(message);
+                }
+
+                coreClient.onMessage('interop-mission', missionListener);
+
+                $element.on('$destroy', () => {
+                    coreClient.removeListener('interop-mission',
+                            missionListener);
+                });
+
+                function obstacleListener(message) {
+                    $scope.map.setObstacles(message);
+                }
+
+                coreClient.onMessage('obstacles', obstacleListener);
+
+                $element.on('$destroy', () => {
+                    coreClient.removeListener('obstacles',
+                            obstacleListener);
+                });
             }],
             template: template
         }
@@ -40,24 +64,34 @@ angular.module('flightView')
             restrict: 'E',
             controller: ['$scope', ($scope) => {
                 $scope.Math = Math;
-                $scope.headingMinor = [];
-                $scope.headingMajor = [];
 
-                let heading = $scope.telemetry.yaw.degrees;
-                let direction = ['N', 'NE', 'E', 'SE', 'S', 'SW', 'W', 'NW'];
+                function setHeadingLines() {
+                    $scope.headingMinor = [];
+                    $scope.headingMajor = [];
 
-                for (let i = -500; i <= 500; i += 5) {
-                    if (Math.abs(heading - i) <= 50 && i % 45 != 0) {
-                        $scope.headingMinor.push(i);
+                    let heading = $scope.telemetry.yaw.degrees;
+                    let direction = ['N', 'NE', 'E', 'SE', 'S', 'SW', 'W',
+                            'NW'];
+
+                    for (let i = -500; i <= 500; i += 5) {
+                        if (Math.abs(heading - i) <= 50 && i % 45 != 0) {
+                            $scope.headingMinor.push(i);
+                        }
+                    }
+
+                    for (let i = -405; i <= 405; i += 45) {
+                        if (Math.abs(heading - i) <= 50) {
+                            $scope.headingMajor.push([i,
+                                    direction[(i % 360 + 360) % 360 / 45]]);
+                        }
                     }
                 }
 
-                for (let i = -405; i <= 405; i += 45) {
-                    if (Math.abs(heading - i) <= 50) {
-                        $scope.headingMajor.push([i,
-                                direction[(i % 360 + 360) % 360 / 45]]);
-                    }
-                }
+                setHeadingLines();
+
+                $scope.$watch('telemetry.yaw.degrees', () => {
+                    setHeadingLines();
+                });
             }],
             templateUrl: './templates/status-box.html'
         }

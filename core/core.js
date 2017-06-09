@@ -1,8 +1,8 @@
 'use strict';
 
 const Database = require('./db/db');
-const IPCServer = require('./net/base/ipc-server');
-const HostServer = require('./net/host-server');
+const IPCServer = require('./net/ipc-server');
+const HostServer = require('./host-server');
 
 const mapboxStatic = require('../util/mapbox-static');
 
@@ -20,7 +20,7 @@ coreServer.on('connect', (socket) => {
 coreServer.onMessage('start.solo', (message, socket) => {
     console.log('Running core in Solo mode.');
 
-    activeServer = new HostServer(message.port, coreServer, socket, false);
+    activeServer = new HostServer(coreServer, socket, false, message.port);
 
     activeServer.listen();
 });
@@ -28,11 +28,10 @@ coreServer.onMessage('start.solo', (message, socket) => {
 coreServer.onMessage('stop', (message, socket) => {
     console.log('Stopping.');
 
-    activeServer.stopListening();
+    activeServer.close();
 });
 
-coreServer.onMessage('map-cache-image',
-        (message, socket) => {
+coreServer.onMessage('map-cache-image', (message, socket) => {
     mapboxStatic.downloadRange(message.zoom, message.lat_1, message.lon_1,
             message.lat_2, message.lon_2, (err) => {
         if (err) {
@@ -44,3 +43,11 @@ coreServer.onMessage('map-cache-image',
 });
 
 coreServer.listen();
+
+module.exports = {
+    cleanup() {
+        if (activeServer !== null) {
+            activeServer.close();
+        }
+    }
+};

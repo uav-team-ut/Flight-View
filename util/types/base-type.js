@@ -6,9 +6,11 @@ class BaseType {
     constructor(defaultFields, fields, options) {
         this._fieldProperties = {};
 
+        let filled = options !== undefined && options.filled === true;
+
         for (let key in defaultFields) {
             if (defaultFields.hasOwnProperty(key)) {
-                this._buildFieldProperties(key, defaultFields[key]);
+                this._buildFieldProperties(key, defaultFields[key], filled);
                 this._buildField(key, this._fieldProperties[key]);
             }
         }
@@ -20,11 +22,12 @@ class BaseType {
      * Build a new field properties object from defaultField.
      *
      * @private
-     * @param {String} field        The name of the field.
-     * @param {Object} defaultField The default properties for the
-     *                              BaseType object.
+     * @param {String}  field        The name of the field.
+     * @param {Object}  defaultField The default properties for the
+     *                               BaseType object.
+     * @param {Boolean} filled       Whether this is a filled type.
      */
-    _buildFieldProperties(field, defaultField) {
+    _buildFieldProperties(field, defaultField, filled) {
         let fieldProperties = {};
 
         // Copy values from defaultField into fieldProperties
@@ -47,7 +50,9 @@ class BaseType {
             }
         })(fieldProperties, defaultField);
 
-        if (fieldProperties.hasOwnProperty('default')) {
+        if (!filled) {
+            fieldProperties.value = undefined;
+        } else if (fieldProperties.hasOwnProperty('default')) {
             fieldProperties.value = fieldProperties.default;
         } else {
             fieldProperties.value = null;
@@ -72,7 +77,9 @@ class BaseType {
                 if (fieldProperties.unit.hasOwnProperty(key)) {
                     Object.defineProperty(newField, key, {
                         get: () => {
-                            if (fieldProperties.unit[key].default) {
+                            if (fieldProperties.value === undefined) {
+                                return undefined;
+                            } else if (fieldProperties.unit[key].default) {
                                 return fieldProperties.value;
                             } else {
                                 return fieldProperties.unit[key].convertTo(
@@ -280,11 +287,12 @@ class BaseType {
      * @see {@link toDocument}
      * @param  {String}   document The document to recover.
      * @param  {Object}   defaults The BaseType defaults if needed.
+     * @param  {Boolean}  filled   Whether this is a filled type.
      * @return {BaseType}          The BaseType created from the
      *                             document.
      */
-    static fromDocument(document, defaults) {
-        return this.deserialize(JSON.stringify(document), defaults);
+    static fromDocument(document, defaults, filled) {
+        return this.deserialize(JSON.stringify(document), defaults, filled);
     }
 
     /**
@@ -322,16 +330,22 @@ class BaseType {
      * @see {@link serialize}
      * @param  {String}   string   The string to deserialize.
      * @param  {Object}   defaults The BaseType defaults if needed.
+     * @param  {Boolean}  filled   Whether this is a filled type.
      * @return {BaseType}          The BaseType created from the
      *                             string.
      */
-    static deserialize(string, defaults) {
+    static deserialize(string, defaults, filled) {
+        if (filled === undefined && typeof defaults == 'boolean') {
+            defaults = filled;
+            filled = undefined;
+        }
+
         let fields = JSON.parse(string);
 
         if (defaults !== undefined) {
-            return new BaseType(defaults, fields);
+            return new BaseType(defaults, fields, {'filled': filled});
         } else {
-            return new this(fields);
+            return new this(fields, {'filled': filled});
         }
     }
 }

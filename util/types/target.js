@@ -5,6 +5,10 @@ const targetCharacteristics = require('./target-characteristics');
 const units = require('./units');
 
 const STANDARD_TARGET_FIELDS = {
+    file: {
+        type: 'string',
+        default: ''
+    },
     lat: {
         type: units.ANGLE,
         verify: (lat) => {
@@ -46,6 +50,10 @@ const STANDARD_TARGET_FIELDS = {
 };
 
 const OFF_AXIS_TARGET_FIELDS = {
+    file: {
+        type: 'string',
+        default: ''
+    },
     orientation: {
         type: targetCharacteristics.ORIENTATION,
         default: null
@@ -69,6 +77,10 @@ const OFF_AXIS_TARGET_FIELDS = {
 };
 
 const EMERGENT_TARGET_FIELDS = {
+    file: {
+        type: 'string',
+        default: ''
+    },
     lat: {
         type: units.ANGLE,
         verify: (lat) => {
