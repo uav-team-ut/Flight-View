@@ -71,12 +71,15 @@ class Datastore extends NeDBDatastore {
         });
     }
 
-    find(query) {
+    find(query, limit) {
         return new Promise((resolve, reject) => {
-            super.find(query, (err, doc) => {
+            let cb = (err, doc) => {
                 if (err) reject(err);
                 else resolve(doc);
-            });
+            };
+
+            if (limit === undefined) super.find(query, cb);
+            else super.find(query).limit(limit).exec(cb);
         });
     }
 
