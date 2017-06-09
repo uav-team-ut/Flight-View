@@ -4,7 +4,7 @@ const express = require('express');
 
 const parsers = require('../parsers');
 
-const angular = require('angular');
+//const angular = require('angular');
 let router = express.Router();
 
 router.get('/', (req, res) => {
@@ -13,8 +13,8 @@ router.get('/', (req, res) => {
     let img_limit=req.query.count;
     let processed=req.query.processed;
     let processed_manual=req.query.processed_manual;
-    if(angular.equals({},processed)==false&&processed==true){
-        if(angular.equals({},img_limit)==false){
+    if(processed.length==0&&processed==true){
+        if(img_limit.length==0){
           res.send(req.app.locals.images.getUnprocessed(img_limit));
         }
         else
@@ -22,8 +22,8 @@ router.get('/', (req, res) => {
           res.send(req.app.locals.images.getUnprocessed());
         }
     }
-    else if(angular.equals({},processed_manual)==false&&processed_manual==true){
-        if(angular.equals({},img_limit)==false){
+    else if(processed_manual.length==0&&processed_manual.length==0){
+        if(img_limit.length==0){
           res.send(req.app.locals.images.getUnprocessed(img_limit));
         }
         else
@@ -32,7 +32,7 @@ router.get('/', (req, res) => {
         }
     }
     else{
-        if(angular.equals({},img_limit)==false){
+        if(img_limit.length==0){
           res.send(req.app.locals.images.getUnprocessed(img_limit));
         }
         else
@@ -60,4 +60,3 @@ router.put('/:id', parsers.json, (req, res) => {
 });
 
 module.exports = router;
-
