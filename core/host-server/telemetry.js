@@ -1,13 +1,23 @@
 'use strict';
 
+const TelemetryType = require('../../util/types').Telemetry;
+
 module.exports = function Telemetry(server) {
     let telemetry = {};
+
+    let recentTelem = new TelemetryType({}, {filled: true});
 
     telemetry.add = (telem) => {
         server.broadcast({
             type: 'telemetry',
             message: telem.serialize()
         });
+
+        recentTelem.add(telem.toDocument());
+
+        // FIXME: we should be able to send in partial types to the
+        // database in the future
+        server.db.telemetry.insert(recentTelem);
 
         let auvsiTelem = telem.toAUVSITelemetry();
         let fields = ['latitude', 'longitude', 'altitude_msl', 'uas_heading'];
@@ -26,6 +36,14 @@ module.exports = function Telemetry(server) {
             });
         }
     };
+
+    telemetry.get = (time) => {
+        if (time === undefined) {
+            return TelemetryType.deserialize(recentTelem.serialize());
+        }
+
+        return server.db.telem.getNearest(time, false)
+    }
 
     return telemetry;
 };

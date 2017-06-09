@@ -17,11 +17,13 @@ router.post('/', parsers.json, (req, res) => {
 });
 
 router.get('/:time', (req, res) => {
-    // return close time, option for splining.
+    let time = parseFloat(req.params.time)
+
+    res.send(req.app.locals.telemetry.get(time).toDocument());
 });
 
 router.get('/recent', (req, res) => {
-    // Return most recently telem
+    res.send(req.app.locals.telemetry.get().toDocument());
 });
 
 module.exports = router;
