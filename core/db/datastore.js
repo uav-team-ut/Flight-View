@@ -100,9 +100,11 @@ class Datastore extends NeDBDatastore {
         return this.findOne({_id: id});
     }
 
-    update(query, update, options) {
+    update(query, updated, options) {
         return new Promise((resolve, reject) => {
-            super.update(query, update, options, (err, numAffected,
+            let doc = updated.toDocument();
+
+            super.update(query, {$set: doc}, options || {}, (err, numAffected,
                     affectedDocuments, upsert) => {
                 if (err) reject(err);
                 else resolve([numAffected, affectedDocuments, upsert]);

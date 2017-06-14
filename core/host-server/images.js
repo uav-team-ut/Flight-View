@@ -15,6 +15,10 @@ module.exports = function Images(server) {
         });
     };
 
+    images.update = (id, image) => {
+        return server.db.images.update({_id: id}, image);
+    };
+
     images.getID = (id) => {
         return server.db.images.findOne({_id: id});
     };
