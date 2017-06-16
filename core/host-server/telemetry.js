@@ -42,7 +42,7 @@ module.exports = function Telemetry(server) {
             return TelemetryType.deserialize(recentTelem.serialize());
         }
 
-        return server.db.telemetry.getNearest(time, false)
+        return server.db.telemetry.getNearest(time, false);
     }
 
     return telemetry;

@@ -23,6 +23,10 @@ class TelemetryDatastore extends Datastore {
     _getCloseTelemetry(time, deleteID) {
         let count = this.count;
 
+        if (count == 0) {
+            return Promise.resolve(null);
+        }
+
         return this.findOne({time: {$gte: time}}).then((doc) => {
             if (doc === null) {
                 let index = count;
@@ -40,6 +44,10 @@ class TelemetryDatastore extends Datastore {
 
     getNearest(time, returnID) {
         return this._getCloseTelemetry(time).then((docs) => {
+            if (docs === null) {
+                return null;
+            }
+
             let index;
 
             if (docs.length === 1 || Math.abs(docs[0].time - time) <=

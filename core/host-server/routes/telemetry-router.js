@@ -21,7 +21,11 @@ router.get('/:time', (req, res) => {
     let time = parseFloat(req.params.time);
 
     req.app.locals.telemetry.get(time).then((telem) => {
-        res.send(telem.toDocument());
+        if (telem !== null) {
+            res.send(telem.toDocument());
+        } else {
+            res.send({});
+        }
     }).catch(helpers.sendError(res));
 });
 

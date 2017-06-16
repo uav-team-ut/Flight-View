@@ -38,7 +38,7 @@ module.exports = class HostServer extends EventEmitter {
         this._app.locals.hostServer = this;
         this._app.locals.coreServer = coreServer;
         this._app.locals.coreSocket = coreSocket;
-        this._app.locals.db = new Database();
+        this._app.locals.db = new Database(false);
         this._app.locals.auvsiClient = new AUVSIClient();
 
         this._app.locals.images = Images(this);
