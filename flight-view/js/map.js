@@ -8,6 +8,8 @@ const Menu = remote.Menu;
 const MenuItem = remote.MenuItem;
 const MapboxMap = mapboxGL.Map;
 
+require('dotenv').config()
+
 const LOCAL_TILES = path.join(__dirname, '../..',
         '.data/map-cache-images/map-cache-{z}-{x}-{y}.jpg');
 
@@ -88,6 +90,36 @@ function buildSearchAreaData(mission) {
             coordinates: searchAreaCoordinates
         }
     };
+}
+
+function buildWaypointsData(mission) {
+    let waypoints = mission.mission_waypoints;
+    let waypointsCoordinates = [];
+
+    // Sort by order in case of stupids
+    waypointsCoordinates.sort((a, b) => parseInt(a.order) - parseInt(b.order));
+
+    for (let i = 0; i < waypoints.length; i++) {
+        waypointsCoordinates.push([
+            waypoints[i].longitude,
+            waypoints[i].latitude
+        ]);
+    }
+
+    return {
+        type: 'Feature',
+        geometry: {
+            type: 'LineString',
+            coordinates: waypointsCoordinates
+        }
+    };
+}
+
+function extractPoint(thing) {
+    return {
+        type: 'Point',
+        coordinates: [thing.longitude, thing.latitude]   
+    }
 }
 
 function generateCircle(lat, lon, radius) {
@@ -260,10 +292,22 @@ class DashboardMap extends MapboxMap {
     }
 
     setInteropMission(mission) {
+        
+        let airDropPosition = extractPoint(mission.air_drop_pos);
         let flyZoneData = buildFlyZoneData(mission);
+        let homePosition = extractPoint(mission.home_pos);
+        let waypointsData = buildWaypointsData(mission);
+        let offAxisTargetPosition = extractPoint(mission.off_axis_target_pos);
+        let emergentLastKnownPosition = extractPoint(
+            mission.emergent_last_known_pos);
         let searchAreaData = buildSearchAreaData(mission);
 
+        this._setAirDropPosition(airDropPosition);
         this._setFlyZone(flyZoneData);
+        this._setHomePosition(homePosition);
+        this._setWaypoints(waypointsData);
+        this._setOffAxisTargetPosition(offAxisTargetPosition);
+        this._setEmergentLastKnownPosition(emergentLastKnownPosition);
         this._setSearchArea(searchAreaData);
     }
 
@@ -273,6 +317,63 @@ class DashboardMap extends MapboxMap {
 
         this._setStatObs(statObsData);
         this._setMovObs(movObsData);
+    }
+
+    setPlanePosition(lat, lon, yaw) {
+        let planeData = {
+            type: 'Point',
+            coordinates: [lon, lat]
+        };
+
+        if (this.getSource('plane') === undefined) {
+            this.addSource('plane', {
+                type:'geojson', data: planeData
+            });
+
+            this.addLayer({
+                id: 'plane',
+                type: 'circle',
+                source: 'plane',
+                paint : {
+                    'circle-radius': 7,
+                    'circle-color': '#fa0d5e',
+                    'circle-blur' : 0.3,
+                    'circle-opacity': 0.9,
+
+                }// layout: {
+                //     'icon-image': 'airport-15',
+                //     'icon-rotation-alignment': 'map'
+                // }
+            });
+
+        } else {
+            this.getSource('plane').setData(planeData);
+        }
+
+        // this.setLayoutProperty('plane', 'icon-rotate', yaw);
+    }
+
+    _setAirDropPosition(airDropPosition) {
+        if (this.getSource('air-drop') === undefined) {
+            this.addSource('air-drop', {
+                type:'geojson', data: airDropPosition
+            });
+
+            this.addLayer({
+                id: 'air-drop',
+                type: 'circle',
+                source: 'air-drop',
+                paint : {
+                    'circle-radius': 7,
+                    'circle-color': '#fae10e',
+                    'circle-blur' : 0.3,
+                    'circle-opacity': 0.9,
+                }
+            });
+
+        } else {
+            this.getSource('air-drop').setData(airDropPosition);
+        }
     }
 
     _setFlyZone(flyZoneData) {
@@ -296,6 +397,98 @@ class DashboardMap extends MapboxMap {
         } else {
             this.getSource('fly-zone').setData(flyZoneData);
         }
+    }
+
+    _setHomePosition(homePosition) {
+        if (this.getSource('home-pos') === undefined) {
+            this.addSource('home-pos', {
+                type:'geojson', data: homePosition
+            });
+
+            this.addLayer({
+                id: 'home-pos',
+                type: 'circle',
+                source: 'home-pos',
+                paint : {
+                    'circle-radius': 7,
+                    'circle-color': '#0ae10e',
+                    'circle-blur' : 0.3,
+                    'circle-opacity': 0.9,
+                }
+            });
+
+        } else {
+            this.getSource('home-pos').setData(homePosition);
+        }
+    }
+
+    _setWaypoints(waypointsData) {
+        if (this.getSource('interop-waypoints') === undefined) {
+            this.addSource('interop-waypoints', {
+                type: 'geojson', data: waypointsData
+            });
+
+            this.addLayer({
+                id: 'interop-waypoints',
+                type: 'line',
+                source: 'interop-waypoints',
+                layout:  {
+                    'line-join': 'bevel'
+                },
+                paint: {
+                    'line-color': '#0000ff',
+                    'line-width': 4
+                }
+            });
+        } else {
+            this.getSource('interop-waypoints').setData(waypointsData);
+        }
+    }
+
+    _setOffAxisTargetPosition(offAxisTargetPosition) {
+        if (this.getSource('off-axis') === undefined) {
+            this.addSource('off-axis', {
+                type:'geojson', data: offAxisTargetPosition
+            });
+
+            this.addLayer({
+                id: 'off-axis',
+                type: 'circle',
+                source: 'off-axis',
+                paint : {
+                    'circle-radius': 7,
+                    'circle-color': '#ff0000',
+                    'circle-blur' : 0.3,
+                    'circle-opacity': 0.9,
+                }
+            });
+
+        } else {
+            this.getSource('off-axis').setData(offAxisTargetPosition);
+        }
+    }
+
+    _setEmergentLastKnownPosition(emergentLastKnownPosition) {
+       if (this.getSource('emergent') === undefined) {
+            this.addSource('emergent', {
+                type:'geojson', data: emergentLastKnownPosition
+            });
+
+            this.addLayer({
+                id: 'emergent',
+                type: 'circle',
+                source: 'emergent',
+                paint : {
+                    'circle-radius': 7,
+                    'circle-color': '#2fade1',
+                    'circle-blur' : 0.3,
+                    'circle-opacity': 0.9,
+                }
+            });
+
+        } else {
+            this.getSource('emergent').setData(emergentLastKnownPosition);
+        } 
     }
 
     _setSearchArea(searchAreaData) {

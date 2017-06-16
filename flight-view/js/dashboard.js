@@ -32,6 +32,14 @@ angular.module('flightView')
                             }
                         });
                     });
+                        
+                    $scope.map.on('load', () => {
+                        $scope.$watch('telemetry.lat.degrees', () => {
+                            $scope.map.setPlanePosition($scope.telemetry.lat.degrees, 
+                                    $scope.telemetry.lon.degrees, 
+                                    $scope.telemetry.yaw.degrees);
+                        });
+                    });
                 });
 
                 function missionListener(message) {

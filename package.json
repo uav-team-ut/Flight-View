@@ -23,7 +23,7 @@
         "download-git-repo": "^0.2.1",
         "express": "^4.15.2",
         "jimp": "^0.2.27",
-        "mapbox-gl": "^0.31.0",
+        "mapbox-gl": "^0.38.0",
         "nedb": "^1.8.0",
         "node-ipc": "^8.10.2",
         "request": "^2.79.0",
