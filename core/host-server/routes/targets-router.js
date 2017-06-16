@@ -3,12 +3,13 @@
 const express = require('express');
 
 const parsers = require('../parsers');
+const helpers = require('./helpers');
 
 let router = express.Router();
 
 router.get('/', (req, res) => {
     req.app.locals.auvsiClient.getTargets((error, targets) => {
-        if (error) res.sendStatus(500);
+        if (error) helpers.sendError(res)(error);
         else res.send(targets);
     });
 });
@@ -28,12 +29,11 @@ router.post('/', parsers.json, (req, res) => {
 
     req.app.locals.auvsiClient.postTarget(targetNoData, (error, target) => {
         if (error) {
-            console.log(error);
-            res.sendStatus(500);
+            helpers.sendError(res)(error);
         } else if (targetData!=undefined) {
             req.app.locals.auvsiClient.putTargetImage(target.id, targetData,
                     (error) => {
-                if (error) res.sendStatus(500);
+                if (error) helpers.sendError(res)(error);
                 else res.sendStatus(200);
             });
         } else {
