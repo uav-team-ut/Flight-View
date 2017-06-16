@@ -48,20 +48,25 @@ angular.module('flightView')
 
                 coreClient.onMessage('interop-mission', missionListener);
 
-                $element.on('$destroy', () => {
-                    coreClient.removeListener('interop-mission',
-                            missionListener);
-                });
-
                 function obstacleListener(message) {
                     $scope.map.setObstacles(message);
                 }
 
                 coreClient.onMessage('obstacles', obstacleListener);
 
+                function targetListener(message) {
+                    $scope.map.setTargets(message);
+                }
+
+                coreClient.onMessage('targets', targetListener);
+
                 $element.on('$destroy', () => {
+                    coreClient.removeListener('interop-mission',
+                            missionListener);
                     coreClient.removeListener('obstacles',
                             obstacleListener);
+                    coreClient.removeListener('targets',
+                            targetListener);
                 });
             }],
             template: template

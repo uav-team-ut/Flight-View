@@ -13,6 +13,8 @@ require('dotenv').config()
 const LOCAL_TILES = path.join(__dirname, '../..',
         '.data/map-cache-images/map-cache-{z}-{x}-{y}.jpg');
 
+let drawnTargets = [];
+
 EARTH_RADIUS = 6371008
 EARTH_ECCEN  = 0.081819
 
@@ -199,6 +201,20 @@ function buildMovObsData(obstacles) {
     };
 }
 
+function buildTargetsData(targets) {
+    let filteredTargets = [];
+
+    for (let i = 0; i < targets.length; i++) {
+        if(targets[i].type === "standard" && 
+                !drawnTargets.includes(targets[i].id)) {
+            filteredTargets.push(targets[i]);
+            drawnTargets.push(targets[i].id);
+        }
+    }
+
+    return filteredTargets;
+}
+
 mapboxGL.accessToken = process.env.FV_MAPBOX_KEY;
 
 class DashboardMap extends MapboxMap {
@@ -221,7 +237,9 @@ class DashboardMap extends MapboxMap {
                         type: 'raster'
                     }
                 ]
-            }
+            },
+            center: [-76.42, 38.14], // starting position
+            zoom: 14 // starting zoom
 
         });
 
@@ -317,6 +335,13 @@ class DashboardMap extends MapboxMap {
 
         this._setStatObs(statObsData);
         this._setMovObs(movObsData);
+    }
+
+    setTargets(targets) {
+        let targetsData = buildTargetsData(targets);
+
+        Console.log("ello");
+        this._setTargets(targetsData);
     }
 
     setPlanePosition(lat, lon, yaw) {
@@ -549,6 +574,29 @@ class DashboardMap extends MapboxMap {
             });
         } else {
             this.getSource('mov-obs').setData(movObsData);
+        }
+    }
+
+    _setTargets(targetsData) {
+        for (let i = 0; i < targetsData.length; i++) {
+            let popup = new mapboxgl.Popup({offset:25}).setText(
+                    "Target #" + targetsData[i].id + '\n' +
+                    "Orientation: " + targetsData[i].orientation + '\n' +
+                    "Shape: " + targetsData[i].shape + '\n' +
+                    "Color: " + targetsData[i].background_color + '\n' +
+                    "Text: " + targetsData[i].alphanumeric + '\n' +
+                    "Text Color: " + targetsData[i].alphanumeric_color + '\n' +
+                    "Description: " + targetsData[i].description + '\n' +
+                    "Autonomous: " + targetsData[i].autonomous
+                );
+
+            let el = document.createElement('div');
+            el.className = 'marker';
+
+            new mapboxgl.Marker(el,{offset:[-25, -25]})
+                .setLngLat([targetsData[i].longitude, targetsData[i].latitude])
+                .setPopup(popup)
+                .addTo(this);
         }
     }
 }

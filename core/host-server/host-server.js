@@ -119,6 +119,26 @@ module.exports = class HostServer extends EventEmitter {
                         });
                     }
 
+                    let broadcastTargets = (callback) => {
+                        if (typeof callback != 'function') {
+                            callback = () => {};
+                        }
+
+                        this.auvsiClient.getTargets((error, targets) => {
+                            if (error) {
+                                callback(error);
+                                return;
+                            }
+
+                            this.broadcast({
+                                type: 'targets',
+                                message: targets
+                            });
+
+                            callback(null);
+                        });
+                    }
+
                     whilst(() => this.auvsiClient.loggedIn, (callback) => {
                         broadcastMission();
 
@@ -129,6 +149,12 @@ module.exports = class HostServer extends EventEmitter {
                         broadcastObstacles();
 
                         setTimeout(() => callback(null, callback), 100);
+                    });
+
+                    whilst(() => this.auvsiClient.loggedIn, (callback) => {
+                        broadcastTargets();
+
+                        setTimeout(() => callback(null, callback), 500);
                     });
                 }
             });
