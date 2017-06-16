@@ -15,15 +15,16 @@ router.get('/', (req, res) => {
 
 router.post('/', parsers.json, (req, res) => {
     let targetNoData = req.body;
-  //  console.log(targetNoData.data);
-  //  console.log(targetNoData.type);
-  //  console.log(req.get('content-type'));
+
     let targetData=req.body.data;
+
     if (targetNoData.hasOwnProperty('data')) {
         delete targetNoData.data;
     }
-    console.log(targetData);
-    console.log(targetNoData);
+
+    console.log('Posting:\n')
+    console.log(req.body);
+    console.log('\n')
 
     req.app.locals.auvsiClient.postTarget(targetNoData, (error, target) => {
         if (error) {
@@ -36,7 +37,6 @@ router.post('/', parsers.json, (req, res) => {
                 else res.sendStatus(200);
             });
         } else {
-          console.log(targetData);
             res.sendStatus(200);
         };
     });

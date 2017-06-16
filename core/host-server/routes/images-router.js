@@ -43,6 +43,14 @@ router.get('/:id', (req, res) => {
     // Return image with id
 });
 
+router.put('/:id', parsers.json, (req, res) => {
+    let image = new Image(req.body);
+    let id = req.params.id;
+
+    req.app.locals.images.update(id, image).then(() => res.sendStatus(200))
+        .catch(helpers.sendError(res));
+});
+
 router.patch('/:id', parsers.json, (req, res) => {
     let image = new Image(req.body);
     let id = req.params.id;
