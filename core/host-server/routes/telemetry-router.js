@@ -3,6 +3,7 @@
 const express = require('express');
 
 const parsers = require('../parsers');
+const helpers = require('./helpers');
 
 const Telemetry = require('../../../util/types').Telemetry;
 
@@ -17,9 +18,11 @@ router.post('/', parsers.json, (req, res) => {
 });
 
 router.get('/:time', (req, res) => {
-    let time = parseFloat(req.params.time)
+    let time = parseFloat(req.params.time);
 
-    res.send(req.app.locals.telemetry.get(time).toDocument());
+    req.app.locals.telemetry.get(time).then((telem) => {
+        res.send(telem.toDocument());
+    }).catch(helpers.sendError(res));
 });
 
 router.get('/recent', (req, res) => {
