@@ -33,6 +33,8 @@ router.get('/', (req, res) => {
 });
 
 router.post('/', parsers.json, (req, res) => {
+    req.body.data_original = '';
+
     let image = new Image(req.body);
 
     req.app.locals.images.add(image).then(() => res.sendStatus(201))

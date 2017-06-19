@@ -89,6 +89,30 @@ class TelemetryDatastore extends Datastore {
             }
         });
     }
+
+    getAlt(time) {
+        if (this.count === 0) {
+            return Promise.resolve(null);
+        }
+
+        return this.findOne({time: {$gte: time}}).then((doc) => {
+            if (doc !== null) return Telemetry.fromDocument(doc);
+            else return null;
+
+            // return new Promise((resolve, reject) => {
+            //     this.oldFind({}).sort({time: -1}).limit(1).exec((doc2) => {
+            //         if (doc2 === null) {
+            //             console.log('well crap this is bad');
+            //
+            //             resolve(null);
+            //             return;
+            //         }
+            //
+            //         resolve(Telemetry.fromDocument(doc2));
+            //     });
+            // });
+        });
+    }
 }
 
 module.exports = TelemetryDatastore;

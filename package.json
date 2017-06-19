@@ -22,12 +22,14 @@
         "dotenv": "^4.0.0",
         "download-git-repo": "^0.2.1",
         "express": "^4.15.2",
+        "heapdump": "^0.3.9",
         "jimp": "^0.2.27",
         "mapbox-gl": "^0.38.0",
         "nedb": "^1.8.0",
         "node-ipc": "^8.10.2",
         "request": "^2.79.0",
-        "sprintf-js": "^1.0.3"
+        "sprintf-js": "^1.0.3",
+        "tmp": "0.0.31"
     },
     "devDependencies": {
         "chai": "^3.5.0",

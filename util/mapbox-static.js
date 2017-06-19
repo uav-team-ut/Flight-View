@@ -17,6 +17,12 @@ fs.mkdir(path.join(__dirname, '..', '.data'), (err) => {
             throw err;
         }
     });
+
+    fs.mkdir(path.join(__dirname, '..', '.data/images'), (err) => {
+        if (err && err.code !== 'EEXIST') {
+            throw err;
+        }
+    });
 });
 
 function getTile(zoom, lat, lon) {

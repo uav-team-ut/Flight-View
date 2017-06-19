@@ -98,7 +98,6 @@ function buildWaypointsData(mission) {
     let waypoints = mission.mission_waypoints;
     let waypointsCoordinates = [];
 
-    // Sort by order in case of stupids
     waypointsCoordinates.sort((a, b) => parseInt(a.order) - parseInt(b.order));
 
     for (let i = 0; i < waypoints.length; i++) {
@@ -120,7 +119,7 @@ function buildWaypointsData(mission) {
 function extractPoint(thing) {
     return {
         type: 'Point',
-        coordinates: [thing.longitude, thing.latitude]   
+        coordinates: [thing.longitude, thing.latitude]
     }
 }
 
@@ -205,8 +204,8 @@ function buildTargetsData(targets) {
     let filteredTargets = [];
 
     for (let i = 0; i < targets.length; i++) {
-        if(targets[i].type === "standard" && 
-                !drawnTargets.includes(targets[i].id)) {
+        if(filteredTargets[i].type === "standard" &&
+                (drawnTargets.indexOf(targets[i].id) == -1)) {
             filteredTargets.push(targets[i]);
             drawnTargets.push(targets[i].id);
         }
@@ -238,9 +237,6 @@ class DashboardMap extends MapboxMap {
                     }
                 ]
             },
-            center: [-76.42, 38.14], // starting position
-            zoom: 14 // starting zoom
-
         });
 
         this.useCache = false;
@@ -310,7 +306,7 @@ class DashboardMap extends MapboxMap {
     }
 
     setInteropMission(mission) {
-        
+
         let airDropPosition = extractPoint(mission.air_drop_pos);
         let flyZoneData = buildFlyZoneData(mission);
         let homePosition = extractPoint(mission.home_pos);
@@ -340,7 +336,7 @@ class DashboardMap extends MapboxMap {
     setTargets(targets) {
         let targetsData = buildTargetsData(targets);
 
-        Console.log("ello");
+        console.log("ello");
         this._setTargets(targetsData);
     }
 
@@ -364,18 +360,12 @@ class DashboardMap extends MapboxMap {
                     'circle-color': '#fa0d5e',
                     'circle-blur' : 0.3,
                     'circle-opacity': 0.9,
-
-                }// layout: {
-                //     'icon-image': 'airport-15',
-                //     'icon-rotation-alignment': 'map'
-                // }
+                }
             });
 
         } else {
             this.getSource('plane').setData(planeData);
         }
-
-        // this.setLayoutProperty('plane', 'icon-rotate', yaw);
     }
 
     _setAirDropPosition(airDropPosition) {
@@ -487,7 +477,6 @@ class DashboardMap extends MapboxMap {
                     'circle-opacity': 0.9,
                 }
             });
-
         } else {
             this.getSource('off-axis').setData(offAxisTargetPosition);
         }
@@ -513,7 +502,7 @@ class DashboardMap extends MapboxMap {
 
         } else {
             this.getSource('emergent').setData(emergentLastKnownPosition);
-        } 
+        }
     }
 
     _setSearchArea(searchAreaData) {
@@ -578,22 +567,58 @@ class DashboardMap extends MapboxMap {
     }
 
     _setTargets(targetsData) {
+        let targetsGeoData = [];
         for (let i = 0; i < targetsData.length; i++) {
-            let popup = new mapboxgl.Popup({offset:25}).setText(
-                    "Target #" + targetsData[i].id + '\n' +
-                    "Orientation: " + targetsData[i].orientation + '\n' +
-                    "Shape: " + targetsData[i].shape + '\n' +
-                    "Color: " + targetsData[i].background_color + '\n' +
-                    "Text: " + targetsData[i].alphanumeric + '\n' +
-                    "Text Color: " + targetsData[i].alphanumeric_color + '\n' +
-                    "Description: " + targetsData[i].description + '\n' +
-                    "Autonomous: " + targetsData[i].autonomous
-                );
+            targetsGeoData.push([targetsData[i].longitude,
+                    targetsData[i].latitude]);
+        }
+
+        targetsData = {
+            type: 'Feature',
+            geometry: {
+                type: 'MultiPoint',
+                coordinates: targetsGeoData
+            }
+        };
+
+        if (this.getSource('targets') === undefined) {
+            this.addSource('targets', {
+                type: 'geojson', data: targetsData
+            });
+
+            this.addLayer({
+                id: 'targets',
+                type: 'circle',
+                source: 'targets',
+                paint : {
+                    'circle-radius': 7,
+                    'circle-color': '#000000',
+                    'circle-blur' : 0.3,
+                    'circle-opacity': 0.9,
+                }
+            });
+        } else {
+            this.getSource('targets').setData(targetsData);
+        }
+    }
+
+    _setTargetsALT(targetsData) {
+        for (let i = 0; i < targetsData.length; i++) {
+            let popup = new mapboxGL.Popup({offset:25}).setText(
+                "Target #" + targetsData[i].id + '\n' +
+                "Orientation: " + targetsData[i].orientation + '\n' +
+                "Shape: " + targetsData[i].shape + '\n' +
+                "Color: " + targetsData[i].background_color + '\n' +
+                "Text: " + targetsData[i].alphanumeric + '\n' +
+                "Text Color: " + targetsData[i].alphanumeric_color + '\n' +
+                "Description: " + targetsData[i].description + '\n' +
+                "Autonomous: " + targetsData[i].autonomous
+            );
 
             let el = document.createElement('div');
             el.className = 'marker';
 
-            new mapboxgl.Marker(el,{offset:[-25, -25]})
+            new mapboxGL.Marker(el, {offset:[-25, -25]})
                 .setLngLat([targetsData[i].longitude, targetsData[i].latitude])
                 .setPopup(popup)
                 .addTo(this);

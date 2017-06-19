@@ -46,6 +46,12 @@ class Datastore extends NeDBDatastore {
 
             this._archive = new Datastore(archiveOptions);
         }
+
+        this.oldFind = super.find;
+        this.oldFindOne = super.findOne;
+        this.oldUpdate = super.oldUpdate;
+        this.oldInsert = super.insert;
+        this.oldRemove = super.remove;
     }
 
     insert(object) {

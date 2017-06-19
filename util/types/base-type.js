@@ -292,6 +292,10 @@ class BaseType {
      *                             document.
      */
     static fromDocument(document, defaults, filled) {
+        if (document.hasOwnProperty('_id')) {
+            delete document._id;
+        }
+
         return this.deserialize(JSON.stringify(document), defaults, filled);
     }
 
