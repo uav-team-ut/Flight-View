@@ -1,6 +1,6 @@
 {
     "name": "flight-view",
-    "version": "0.0.1",
+    "version": "0.1.0",
     "description": "",
     "main": "main.js",
     "scripts": {
@@ -39,6 +39,6 @@
     },
     "repository": {
         "type": "git",
-        "url": "git://github.com/uav-team-ut/Flight-View.git"
+        "url": "git://github.com/uavaustin/Flight-View.git"
     }
 }
