@@ -1,14 +1,17 @@
 language: node_js
 node_js:
-    - node
+    - '8'
     - '7'
     - '6'
-python:
-    - '3.5'
 sudo: required
 dist: trusty
 services:
     - docker
+branches:
+    - master
+    - development
+    - /^release-.*$/
+    - /^hotfix-.*$/
 before_install:
     - sudo apt-get -y install python3-pip python-dev
     - sudo pip3 install -U setuptools
