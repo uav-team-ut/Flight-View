@@ -1,12 +1,13 @@
-/node_modules/
-/docs
+node_modules/
+npm-debug.log*
+
+docs/
+
+coverage/
+.nyc_output/
 
 .data/
 fonts/
 
 .env
 *.min.*
-
-image_processing_files/
-__pycache__/
-*.pyc

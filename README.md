@@ -4,6 +4,12 @@ Flight&nbsp;View
 [![Build Status](
     https://travis-ci.org/uavaustin/Flight-View.svg?branch=master)](
     https://travis-ci.org/uavaustin/Flight-View)
+[![Code Climate](
+    https://codeclimate.com/github/uavaustin/Flight-View/badges/gpa.svg)](
+    https://codeclimate.com/github/uavaustin/Flight-View)
+[![Test Coverage](
+    https://codeclimate.com/github/uavaustin/Flight-View/badges/coverage.svg)](
+    https://codeclimate.com/github/uavaustin/Flight-View/coverage)
 
 > Unmanned Aerial Vehicle Team | UT Austin
 
