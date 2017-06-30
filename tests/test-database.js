@@ -32,7 +32,7 @@ describe('Database', function () {
     });
 
     afterEach(function (done) {
-        setTimeout(done, 30);
+        setTimeout(done, 200);
     });
 
     describe('#telemetry', function () {

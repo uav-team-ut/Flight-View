@@ -4,7 +4,7 @@ code=0
 
 # Try running the tests 10 times.
 for i in {1..10}; do
-    mocha tests --recursive
+    nyc --all --reporter=lcov mocha tests --recursive
 
     code=$?
 

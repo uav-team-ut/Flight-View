@@ -7,6 +7,9 @@ sudo: required
 dist: trusty
 services:
     - docker
+addons:
+    code_climate:
+        repo_token: $CODE_CLIMATE_TOKEN
 branches:
     only:
         - master
@@ -14,9 +17,6 @@ branches:
         - /^release-.*$/
         - /^hotfix-.*$/
 before_install:
-    - sudo apt-get -y install python3-pip python-dev
-    - sudo pip3 install -U setuptools
-    - sudo pip3 install -U virtualenvwrapper
     - sudo apt-get install xvfb
 install:
     - export DISPLAY=':99.0'
@@ -26,6 +26,9 @@ install:
     - npm install
     - npm install -g mocha
 script:
-    - ./scripts/run-tests-repeat
+    - npm run test-travis
+after_success:
+    - npm install -g codeclimate-test-reporter
+    - codeclimate-test-reporter < coverage/lcov.info
 notifications:
     email: false

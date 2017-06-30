@@ -7,6 +7,7 @@
         "start": "electron .",
         "postinstall": "node scripts/install-dependencies.js",
         "test": "mocha tests --recursive",
+        "test-travis": "./scripts/run-tests-travis.sh",
         "build-docs": "jsdoc flight-view core util -r -R README.md -d docs"
     },
     "author": "Unmanned Aerial Vehicle Team | University of Texas at Austin",
@@ -35,10 +36,14 @@
         "chai": "^3.5.0",
         "electron-prebuilt": "1.4.13",
         "jsdoc": "^3.4.3",
-        "mocha": "^3.2.0"
+        "mocha": "^3.2.0",
+        "nyc": "^11.0.3"
     },
     "repository": {
         "type": "git",
         "url": "git://github.com/uavaustin/Flight-View.git"
+    },
+    "nyc": {
+        "include": ["core", "flight-view", "util"]
     }
 }
