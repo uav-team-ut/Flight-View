@@ -7,6 +7,9 @@ Flight&nbsp;View
 [![Code Climate](
     https://codeclimate.com/github/uavaustin/Flight-View/badges/gpa.svg)](
     https://codeclimate.com/github/uavaustin/Flight-View)
+[![Test Coverage](
+    https://codeclimate.com/github/uavaustin/Flight-View/badges/coverage.svg)](
+    https://codeclimate.com/github/uavaustin/Flight-View/coverage)
 
 > Unmanned Aerial Vehicle Team | UT Austin
 
