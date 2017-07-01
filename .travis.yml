@@ -32,3 +32,8 @@ after_success:
     - codeclimate-test-reporter < coverage/lcov.info
 notifications:
     email: false
+    slack:
+        rooms:
+            - secure: jzS8783UlqWvAMB8145Ia19b/hw6BpXNt/viIJ2A3hiCOlrxA6KOQQv6GYHqjUQKg8idCN3EbiQ+W/v+6yqhGlGd0bkQjKl8PLxiRMKhSYQpZ7TSEyjZ8CcTeQI/pPTU6wjkyrCToY1Yk9JkQKfGIiVCzEfsxNApq3j9/86vME3lMh23zvKNnfTzz6XQSvyuPZcjmMornB7N+jns17Xt2+Yt2R4rKKdxX/DTQ/6oxQ1sxQHFOiJJPTd7uUJ3iBLYq0AGOx6Sprn7luuXhbMJHRelvrxlB4HEGSMFdKn1gdugqeBllE+pa9uW6/xmoH++829vKytS2BWRbhXmxptxadB+WEcXRIWELYk1r7Wp+Y4H/pwE+/i6dOEx1MKK6n+qVAjeskeq1S7PSzoe4A3nnsLFAEThVkC357RMoEKhDsyWvEnshQW7J/LXQNdKcr+WJ+LF4HWinqY8VXEuTsoSonipUDpYm4KQRso8DkxJSk4Vfabi0h9VNxuo9IgXItDO6IOCuKYAfoigPo6eBbfun/4YjzTBgp5qc9Udu/pFW/sk/SWsx1xlE1qfxOtFnGlAWp1TY00S3tgUbJOresTBXqpVxT8t4kFOBW8UmrvlvpecQWcdB1hAaMnr1rqh6E+dMi0ZaJd7tzclwDWz625+0iYIIiwwy5clODhowfpTJW0=
+        on_success: change
+        on_failure: always
