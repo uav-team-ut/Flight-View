@@ -1,49 +1,51 @@
 'use strict';
 
+const request = require('request');
+
 const TelemetryType = require('../../util/types').Telemetry;
 
 module.exports = function Telemetry(server) {
     let telemetry = {};
 
-    let recentTelem = new TelemetryType({}, {filled: true});
+    console.log('Starting telemetry poller');
 
-    telemetry.add = (telem) => {
-        server.broadcast({
-            type: 'telemetry',
-            message: telem.serialize()
-        });
-
-        recentTelem.add(telem.toDocument());
-
-        // FIXME: we should be able to send in partial types to the
-        // database in the future
-        server.db.telemetry.insert(recentTelem);
-
-        let auvsiTelem = telem.toAUVSITelemetry();
-        let fields = ['latitude', 'longitude', 'altitude_msl', 'uas_heading'];
-        let send = true;
-
-        for (let i = 0; i < fields.length; i++) {
-            if (auvsiTelem[fields[i]] === undefined) {
-                send = false;
-                break;
+    setInterval(() => {
+        request.get({
+            uri: `http://${process.env.TELEMETRY_HOST || '127.0.0.1:5000'}/api/overview`,
+            time: true,
+            timeout: 5000,
+            headers: {
+                accept: 'application/json'
             }
-        }
-
-        if (send && server.auvsiClient.loggedIn) {
-            server.auvsiClient.postTelemetry(auvsiTelem, (error) => {
-                if (error) console.error(error);
-            });
-        }
-    };
-
-    telemetry.get = (time) => {
-        if (time === undefined) {
-            return TelemetryType.deserialize(recentTelem.serialize());
-        }
-
-        return server.db.telemetry.getAlt(time);
-    }
+        }, (err, res) => {
+            if (err) {
+                console.error(err);
+                return;
+            }
+            const telem = JSON.parse(res.body);
+            try {
+                const telemMessage = {
+                    lat: telem.pos.lat,
+                    lon: telem.pos.lon,
+                    alt: telem.alt.agl,
+                    alt_msl: telem.alt.msl,
+                    yaw: telem.rot.yaw,
+                    pitch: telem.rot.pitch,
+                    roll: telem.rot.roll,
+                    airspeed: telem.speed.airspeed,
+                    groundspeed: telem.speed.ground_speed,
+                    battery_percentage: telem.battery.percentage,
+                    battery_current: telem.battery.current
+                };
+                server.broadcast({
+                    type: 'telemetry',
+                    message: new TelemetryType(telemMessage).serialize()
+                });
+            } catch (e) {
+                console.error(e);
+            }
+        });
+    }, 500);
 
     return telemetry;
 };

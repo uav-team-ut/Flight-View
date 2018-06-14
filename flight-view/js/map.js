@@ -311,7 +311,7 @@ class DashboardMap extends MapboxMap {
         let flyZoneData = buildFlyZoneData(mission);
         let homePosition = extractPoint(mission.home_pos);
         let waypointsData = buildWaypointsData(mission);
-        let offAxisTargetPosition = extractPoint(mission.off_axis_target_pos);
+        let offAxisTargetPosition = extractPoint(mission.off_axis_odlc_pos);
         let emergentLastKnownPosition = extractPoint(
             mission.emergent_last_known_pos);
         let searchAreaData = buildSearchAreaData(mission);

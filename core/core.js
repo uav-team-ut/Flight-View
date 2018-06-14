@@ -1,6 +1,5 @@
 'use strict';
 
-const Database = require('./db/db');
 const IPCServer = require('./net/ipc-server');
 const HostServer = require('./host-server');
 
@@ -10,15 +9,15 @@ let coreServer = new IPCServer('core');
 let activeServer = null;
 
 coreServer.on('listening', () => {
-    console.log('server listening');
+    console.log('IPC server listening');
 });
 
 coreServer.on('connect', (socket) => {
-    console.log('socket connected');
+    console.log('IPC socket connected');
 });
 
 coreServer.onMessage('start.solo', (message, socket) => {
-    console.log('Running core in Solo mode.');
+    console.log('Starting core in Solo mode.');
 
     activeServer = new HostServer(coreServer, socket, false, message.port);
 
@@ -37,7 +36,7 @@ coreServer.onMessage('map-cache-image', (message, socket) => {
         if (err) {
             console.error(err);
         } else {
-            console.log('cache download complete');
+            console.log('Cache download complete. It is now ready for use.');
         }
     });
 });

@@ -12,11 +12,12 @@ app.on('ready', () => {
     let mainWindow = new BrowserWindow({
         width: 1200,
         height: 750,
-        title: 'Flight View',
-        show: false
+        title: 'UAV Austin - Flight View',
+        show: false,
+        webPreferences: {
+            devTools: true
+        }
     });
-
-    mainWindow.setMenu(null);
 
     mainWindow.loadURL('file://' + __dirname + '/flight-view/index.html');
 
