@@ -9,6 +9,7 @@ const whilst = require('async/whilst');
 
 const AUVSIClient = require('../net/auvsi-client');
 const Telemetry = require('./telemetry');
+const Targets = require('./targets');
 
 const DEFAULT_PORT = 25005;
 
@@ -25,7 +26,8 @@ module.exports = class HostServer extends EventEmitter {
         this._app.locals.coreServer = coreServer;
         this._app.locals.coreSocket = coreSocket;
         this._app.locals.auvsiClient = new AUVSIClient();
-        this._app.locals.telemetry = new Telemetry(this);
+        this._app.locals.telemetry = Telemetry(this);
+        this._app.locals.targets = Targets(this, this.auvsiClient);
 
         this._listeners = {};
 
@@ -155,6 +157,9 @@ module.exports = class HostServer extends EventEmitter {
 
         this.auvsiClient.logout();
 
+        this.telemetry.close();
+        this.targets.close();
+
         this.coreSocket.removeListener('login.request',
                 this._listeners.handleLogin);
     }
@@ -173,5 +178,13 @@ module.exports = class HostServer extends EventEmitter {
 
     get auvsiClient() {
         return this._app.locals.auvsiClient;
+    }
+
+    get telemetry() {
+        return this._app.locals.telemetry;
+    }
+
+    get targets() {
+        return this._app.locals.targets;
     }
 }

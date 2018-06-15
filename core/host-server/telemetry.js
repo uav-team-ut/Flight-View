@@ -6,10 +6,16 @@ const TelemetryType = require('../../util/types').Telemetry;
 
 module.exports = function Telemetry(server) {
     let telemetry = {};
+    telemetry.polling = true;
+    telemetry.close = function () {
+        telemetry.polling = false;
+    }
 
     console.log('Starting telemetry poller');
 
-    setInterval(() => {
+    telemetry._poll = function () {
+        if (!telemetry.polling) return;
+
         request.get({
             uri: `http://${process.env.TELEMETRY_HOST || '127.0.0.1:5000'}/api/overview`,
             time: true,
@@ -18,12 +24,9 @@ module.exports = function Telemetry(server) {
                 accept: 'application/json'
             }
         }, (err, res) => {
-            if (err) {
-                console.error(err);
-                return;
-            }
-            const telem = JSON.parse(res.body);
             try {
+                if (err) throw err;
+                const telem = JSON.parse(res.body);
                 const telemMessage = {
                     lat: telem.pos.lat,
                     lon: telem.pos.lon,
@@ -34,8 +37,9 @@ module.exports = function Telemetry(server) {
                     roll: telem.rot.roll,
                     airspeed: telem.speed.airspeed,
                     groundspeed: telem.speed.ground_speed,
-                    battery_percentage: telem.battery.percentage,
-                    battery_current: telem.battery.current
+                    battery_percentage: telem.battery ? telem.battery.percentage : undefined,
+                    battery_current: telem.battery ? telem.battery.current : undefined,
+                    mode: telem.mode
                 };
                 server.broadcast({
                     type: 'telemetry',
@@ -43,9 +47,13 @@ module.exports = function Telemetry(server) {
                 });
             } catch (e) {
                 console.error(e);
+            } finally {
+                setTimeout(() => telemetry._poll(), 500);
             }
         });
-    }, 500);
+    }
+
+    telemetry._poll();
 
     return telemetry;
 };

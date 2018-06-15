@@ -39,7 +39,7 @@ const STANDARD_TARGET_FIELDS = {
         type: targetCharacteristics.COLOR,
         default: null
     },
-    alphameric: {
+    alphanumeric: {
         type: targetCharacteristics.ALPHANUMERIC,
         default: null
     },
@@ -70,7 +70,7 @@ const OFF_AXIS_TARGET_FIELDS = {
         type: targetCharacteristics.COLOR,
         default: null
     },
-    alphameric: {
+    alphanumeric: {
         type: targetCharacteristics.ALPHANUMERIC,
         default: null
     },

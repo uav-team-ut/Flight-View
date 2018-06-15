@@ -13,6 +13,15 @@ require('dotenv').config()
 const LOCAL_TILES = path.join(__dirname, '../..',
         '.data/map-cache-images/map-cache-{z}-{x}-{y}.jpg');
 
+const icons = {
+    plane: { url: 'img/icons/plane.png', name: 'plane' },
+    airdrop: { url: 'img/icons/airdrop.png', name: 'airdrop' },
+    home: { url: 'img/icons/home.png', name: 'home' },
+    offaxis: { url: 'img/icons/offaxis.png', name: 'offaxis' },
+    target: { url: 'img/icons/target.png', name: 'target' },
+    emergent: { url: 'img/icons/unknown.png', name: 'emergent' },
+}
+
 let drawnTargets = [];
 
 EARTH_RADIUS = 6371008
@@ -245,6 +254,16 @@ class DashboardMap extends MapboxMap {
         this.dragRotate.disable();
 
         this._makeContextMenu();
+
+        for (let icon in icons) {
+            this.loadImage(`${icons[icon].url}`, (err, img) => {
+                if (err) {
+                    console.error(err);
+                } else {
+                    this.addImage(icons[icon].name, img);
+                }
+            });
+        }
     }
 
     _makeContextMenu() {
@@ -292,17 +311,17 @@ class DashboardMap extends MapboxMap {
     }
 
     showCache() {
+        this.addSource('cache', cacheSource);
+        this.addLayer(cacheLayer, 'mapbox-satellite');
         this.removeLayer('mapbox-satellite')
         this.removeSource('mapbox-satellite');
-        this.addSource('cache', cacheSource);
-        this.addLayer(cacheLayer)
     }
 
     hideCache() {
+        this.addSource('mapbox-satellite', satelliteSource);
+        this.addLayer(satelliteLayer, 'cache');
         this.removeLayer('cache')
         this.removeSource('cache');
-        this.addSource('mapbox-satellite', satelliteSource);
-        this.addLayer(satelliteLayer);
     }
 
     setInteropMission(mission) {
@@ -336,7 +355,6 @@ class DashboardMap extends MapboxMap {
     setTargets(targets) {
         let targetsData = buildTargetsData(targets);
 
-        console.log("ello");
         this._setTargets(targetsData);
     }
 
@@ -348,16 +366,23 @@ class DashboardMap extends MapboxMap {
 
         if (this.getSource('plane') === undefined) {
             this.addSource('plane', {
-                type:'geojson', data: planeData
+                type: 'geojson', data: planeData
             });
 
             this.addLayer({
                 id: 'plane',
                 type: 'circle',
                 source: 'plane',
+                /*
+                layout: {
+                    'icon-image': icons.plane.name,
+                    'icon-size': .5,
+                    //'icon-color': '#fa0d5e'
+                },
+                */
                 paint : {
                     'circle-radius': 7,
-                    'circle-color': '#fa0d5e',
+                    'circle-color': '#3fb51c',
                     'circle-blur' : 0.3,
                     'circle-opacity': 0.9,
                 }
@@ -376,14 +401,21 @@ class DashboardMap extends MapboxMap {
 
             this.addLayer({
                 id: 'air-drop',
-                type: 'circle',
+                type: 'symbol',
                 source: 'air-drop',
+                layout: {
+                    'icon-image': icons.airdrop.name,
+                    'icon-size': .5,
+                    //'icon-color': '#fae10e'
+                },
+                /*
                 paint : {
                     'circle-radius': 7,
                     'circle-color': '#fae10e',
                     'circle-blur' : 0.3,
                     'circle-opacity': 0.9,
                 }
+                */
             });
 
         } else {
@@ -409,6 +441,12 @@ class DashboardMap extends MapboxMap {
                     'line-width': 4
                 }
             });
+
+            const coords = flyZoneData.geometry.coordinates;
+            console.log(coords);
+            console.log(coords[0]);
+            console.log(coords[0][0]);
+            this.flyTo({ center: [coords[0][0][0][0], coords[0][0][0][1]], zoom: 14 });
         } else {
             this.getSource('fly-zone').setData(flyZoneData);
         }
@@ -422,14 +460,21 @@ class DashboardMap extends MapboxMap {
 
             this.addLayer({
                 id: 'home-pos',
-                type: 'circle',
+                type: 'symbol',
                 source: 'home-pos',
+                layout: {
+                    'icon-image': icons.home.name,
+                    'icon-size': .5,
+                    //'icon-color': '#0ae10e'
+                },
+                /*
                 paint : {
                     'circle-radius': 7,
                     'circle-color': '#0ae10e',
                     'circle-blur' : 0.3,
                     'circle-opacity': 0.9,
                 }
+                */
             });
 
         } else {
@@ -468,14 +513,21 @@ class DashboardMap extends MapboxMap {
 
             this.addLayer({
                 id: 'off-axis',
-                type: 'circle',
+                type: 'symbol',
                 source: 'off-axis',
+                layout: {
+                    'icon-image': icons.offaxis.name,
+                    'icon-size': .5,
+                    //'icon-color': '#ff0000'
+                },
+                /*
                 paint : {
                     'circle-radius': 7,
                     'circle-color': '#ff0000',
                     'circle-blur' : 0.3,
                     'circle-opacity': 0.9,
                 }
+                */
             });
         } else {
             this.getSource('off-axis').setData(offAxisTargetPosition);
@@ -490,14 +542,21 @@ class DashboardMap extends MapboxMap {
 
             this.addLayer({
                 id: 'emergent',
-                type: 'circle',
+                type: 'symbol',
                 source: 'emergent',
+                layout: {
+                    'icon-image': icons.emergent.name,
+                    'icon-size': .5,
+                    //'icon-color': '#ff0000'
+                },
+                /*
                 paint : {
                     'circle-radius': 7,
                     'circle-color': '#2fade1',
                     'circle-blur' : 0.3,
                     'circle-opacity': 0.9,
                 }
+                */
             });
 
         } else {
@@ -588,14 +647,21 @@ class DashboardMap extends MapboxMap {
 
             this.addLayer({
                 id: 'targets',
-                type: 'circle',
+                type: 'symbol',
                 source: 'targets',
+                layout: {
+                    'icon-image': icons.target.name,
+                    'icon-size': .5,
+                    //'icon-color': '#000000'
+                },
+                /*
                 paint : {
                     'circle-radius': 7,
                     'circle-color': '#000000',
                     'circle-blur' : 0.3,
                     'circle-opacity': 0.9,
                 }
+                */
             });
         } else {
             this.getSource('targets').setData(targetsData);
