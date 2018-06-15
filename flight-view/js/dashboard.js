@@ -60,6 +60,12 @@ angular.module('flightView')
 
                 coreClient.onMessage('targets', targetListener);
 
+                function waypointListener(message) {
+                    $scope.map.setWaypoints(message);
+                }
+
+                coreClient.onMessage('waypoints', waypointListener);
+
                 $element.on('$destroy', () => {
                     coreClient.removeListener('interop-mission',
                             missionListener);

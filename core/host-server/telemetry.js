@@ -53,7 +53,36 @@ module.exports = function Telemetry(server) {
         });
     }
 
+    telemetry._pollWaypoints = function () {
+        if (!telemetry.polling) return;
+
+        request.get({
+            uri: `http://${process.env.TELEMETRY_HOST || '127.0.0.1:5000'}/api/raw-mission`,
+            time: true,
+            timeout: 5000,
+            headers: {
+                accept: 'application/json'
+            }
+        }, (err, res) => {
+            try {
+                if (err) throw err;
+                const telem = JSON.parse(res.body);
+                server.broadcast({
+                    type: 'waypoints',
+                    message: {
+                        mission_waypoints: telem
+                    }
+                });
+            } catch (e) {
+                console.error(e);
+            } finally {
+                setTimeout(() => telemetry._pollWaypoints(), 2500);
+            }
+        });
+    }
+
     telemetry._poll();
+    telemetry._pollWaypoints();
 
     return telemetry;
 };

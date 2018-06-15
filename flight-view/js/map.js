@@ -358,6 +358,12 @@ class DashboardMap extends MapboxMap {
         this._setTargets(targetsData);
     }
 
+    setWaypoints(waypoints) {
+        let waypointsData = buildWaypointsData(waypoints);
+
+        this._setWaypoints(waypointsData);
+    }
+
     setPlanePosition(lat, lon, yaw) {
         let planeData = {
             type: 'Point',
