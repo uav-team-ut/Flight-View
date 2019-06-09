@@ -1,34 +1,34 @@
 language: node_js
 node_js:
-    - '8'
-    - '7'
-    - '6'
+  - '8'
+  - '7'
+  - '6'
 sudo: required
 dist: trusty
 services:
-    - docker
+  - docker
 addons:
-    code_climate:
-        repo_token: $CODE_CLIMATE_TOKEN
+  code_climate:
+    repo_token: $CODE_CLIMATE_TOKEN
 branches:
-    only:
-        - master
-        - development
-        - /^release-.*$/
-        - /^hotfix-.*$/
+  only:
+    - master
+    - development
+    - /^release-.*$/
+    - /^hotfix-.*$/
 before_install:
-    - sudo apt-get install xvfb
+  - sudo apt-get install xvfb
 install:
-    - export DISPLAY=':99.0'
-    - Xvfb :99 -screen 0 1024x768x24 > /dev/null 2>&1 &
-    - docker pull auvsisuas/interop-server
-    - docker images
-    - npm install
-    - npm install -g mocha
+  - export DISPLAY=':99.0'
+  - Xvfb :99 -screen 0 1024x768x24 > /dev/null 2>&1 &
+  - docker pull auvsisuas/interop-server
+  - docker images
+  - npm install
+  - npm install -g mocha
 script:
-    - npm run test-travis
+  - npm run test-travis
 after_success:
-    - npm install -g codeclimate-test-reporter
-    - codeclimate-test-reporter < coverage/lcov.info
+  - npm install -g codeclimate-test-reporter
+  - codeclimate-test-reporter < coverage/lcov.info
 notifications:
-    email: false
+  email: false

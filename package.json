@@ -1,53 +1,54 @@
 {
-    "name": "flight-view",
-    "version": "0.1.0",
-    "description": "",
-    "main": "main.js",
-    "scripts": {
-        "start": "electron .",
-        "postinstall": "node scripts/install-dependencies.js",
-        "test": "mocha tests --recursive",
-        "test-travis": "./scripts/run-tests-travis.sh",
-        "build-docs": "jsdoc flight-view core util -r -R README.md -d docs"
-    },
-    "author": "Unmanned Aerial Vehicle Team | University of Texas at Austin",
-    "license": "GPL-3.0",
-    "dependencies": {
-        "angular": "1.6.0",
-        "angular-animate": "1.6.0",
-        "angular-sanitize": "1.6.0",
-        "angular-ui-bootstrap": "2.3.1",
-        "async": "^2.4.1",
-        "body-parser": "^1.17.1",
-        "dateformat": "^2.0.0",
-        "dotenv": "^4.0.0",
-        "download-git-repo": "^0.2.1",
-        "express": "^4.15.2",
-        "heapdump": "^0.3.9",
-        "jimp": "^0.2.27",
-        "mapbox-gl": "^0.38.0",
-        "nedb": "^1.8.0",
-        "node-ipc": "^8.10.2",
-        "request": "^2.79.0",
-        "sprintf-js": "^1.0.3",
-        "tmp": "0.0.31"
-    },
-    "devDependencies": {
-        "chai": "^3.5.0",
-        "electron": "^2.0.2",
-        "jsdoc": "^3.4.3",
-        "mocha": "^3.2.0",
-        "nyc": "^11.0.3"
-    },
-    "repository": {
-        "type": "git",
-        "url": "git://github.com/uavaustin/Flight-View.git"
-    },
-    "nyc": {
-        "include": [
-            "core",
-            "flight-view",
-            "util"
-        ]
-    }
+  "name": "flight-view",
+  "version": "0.1.0",
+  "description": "",
+  "main": "main.js",
+  "scripts": {
+    "start": "electron .",
+    "postinstall": "node scripts/install-dependencies.js",
+    "test": "mocha tests --recursive",
+    "test-travis": "./scripts/run-tests-travis.sh",
+    "build-docs": "jsdoc flight-view core util -r -R README.md -d docs"
+  },
+  "author": "Unmanned Aerial Vehicle Team | University of Texas at Austin",
+  "license": "GPL-3.0",
+  "dependencies": {
+    "angular": "1.6.0",
+    "angular-animate": "1.6.0",
+    "angular-sanitize": "1.6.0",
+    "angular-ui-bootstrap": "2.3.1",
+    "async": "^2.4.1",
+    "body-parser": "^1.17.1",
+    "dateformat": "^2.0.0",
+    "dotenv": "^4.0.0",
+    "download-git-repo": "^0.2.1",
+    "express": "^4.15.2",
+    "heapdump": "^0.3.9",
+    "jimp": "^0.2.27",
+    "mapbox-gl": "^0.38.0",
+    "nedb": "^1.8.0",
+    "node-ipc": "^8.10.2",
+    "request": "^2.79.0",
+    "sprintf-js": "^1.0.3",
+    "tmp": "0.0.31"
+  },
+  "devDependencies": {
+    "chai": "^3.5.0",
+    "electron": "^2.0.2",
+    "jsdoc": "^3.4.3",
+    "mocha": "^3.2.0",
+    "nyc": "^11.0.3",
+    "prettier-eslint": "^8.8.2"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/uavaustin/Flight-View.git"
+  },
+  "nyc": {
+    "include": [
+      "core",
+      "flight-view",
+      "util"
+    ]
+  }
 }

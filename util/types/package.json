@@ -1,5 +1,5 @@
 {
-    "name": "types",
-    "main": "types.js",
-    "private": true
+  "name": "types",
+  "main": "types.js",
+  "private": true
 }

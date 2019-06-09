@@ -12,100 +12,108 @@ let coreClient = new IPCClient('flight-view', 'core');
 
 exports.coreClient = coreClient;
 
-let default_telemetry = new Telemetry({}, {filled: true});
+let default_telemetry = new Telemetry({}, { filled: true });
 
-angular.module('flightView', ['ngAnimate', 'ngSanitize', 'ui.bootstrap'])
-    .controller('FlightViewController', ['$scope', ($scope) => {
-        $scope.openTab = 'dashboard';
+angular
+  .module('flightView', ['ngAnimate', 'ngSanitize', 'ui.bootstrap'])
+  .controller('FlightViewController', [
+    '$scope',
+    ($scope) => {
+      $scope.openTab = 'dashboard';
+      $scope.started = false;
+
+      $scope.coreClient = coreClient;
+
+      $scope.toggleConsole = () => {
+        let webContents = remote.getCurrentWebContents();
+
+        if (!webContents.isDevToolsOpened()) {
+          webContents.openDevTools({ detach: true });
+        } else {
+          webContents.closeDevTools();
+        }
+      };
+
+      $scope.startSolo = () => {
+        coreClient.send({
+          type: 'start',
+          message: {
+            type: 'solo',
+            message: null
+          }
+        });
+
+        // TODO: Verify that the server started successfully
+        $scope.started = true;
+        $scope.canLogIn = true;
+      };
+
+      $scope.stop = () => {
+        coreClient.send({
+          type: 'stop',
+          message: null
+        });
+
+        // TODO: Verify that the server stopped successfully
         $scope.started = false;
-
-        $scope.coreClient = coreClient;
-
-        $scope.toggleConsole = () => {
-            let webContents = remote.getCurrentWebContents();
-
-            if (!webContents.isDevToolsOpened()) {
-                webContents.openDevTools({detach: true});
-            } else {
-                webContents.closeDevTools();
-            }
-        };
-
-        $scope.startSolo = () => {
-            coreClient.send({
-                type: 'start',
-                message: {
-                    type: 'solo',
-                    message: null
-                }
-            });
-
-            // TODO: Verify that the server started successfully
-            $scope.started = true;
-            $scope.canLogIn = true;
-        };
-
-        $scope.stop = () => {
-            coreClient.send({
-                type: 'stop',
-                message: null
-            });
-
-            // TODO: Verify that the server stopped successfully
-            $scope.started = false;
-            $scope.canLogIn = false;
-        };
-
         $scope.canLogIn = false;
+      };
 
-        $scope.loginInterop = (url, username, password) => {
-            coreClient.send({
-                type: 'login.request',
-                message: {
-                    url: url,
-                    username: username,
-                    password: password
-                }
-            });
-        };
+      $scope.canLogIn = false;
 
-        coreClient.onMessage('login.fail', (message) => {
-            console.log(message);
+      $scope.loginInterop = (url, username, password) => {
+        coreClient.send({
+          type: 'login.request',
+          message: {
+            url: url,
+            username: username,
+            password: password
+          }
         });
+      };
 
-        coreClient.onMessage('login.success', (message) => {
-            $scope.canLogIn = false;
-            $scope.loggedIn = true;
-            console.log('Login success');
-            $scope.$apply();
-        });
-    }])
-    .controller('TelemetryController', ['$scope', '$element', '$attrs',
-            ($scope, $element, $attrs) => {
-        $scope.telemetry = default_telemetry;
+      coreClient.onMessage('login.fail', (message) => {
+        console.log(message);
+      });
 
-        function eventListener(message) {
-            let new_telemetry = Telemetry.deserialize(message);
+      coreClient.onMessage('login.success', (message) => {
+        $scope.canLogIn = false;
+        $scope.loggedIn = true;
+        console.log('Login success');
+        $scope.$apply();
+      });
+    }
+  ])
+  .controller('TelemetryController', [
+    '$scope',
+    '$element',
+    '$attrs',
+    ($scope, $element, $attrs) => {
+      $scope.telemetry = default_telemetry;
 
-            let doc = new_telemetry.toDocument();
-            let newFields = {};
+      function eventListener(message) {
+        let new_telemetry = Telemetry.deserialize(message);
 
-            for (let field in doc) {
-                if (doc.hasOwnProperty(field)) {
-                    if (doc[field] !== undefined) {
-                        newFields[field] = doc[field];
-                    }
-                }
+        let doc = new_telemetry.toDocument();
+        let newFields = {};
+
+        for (let field in doc) {
+          if (doc.hasOwnProperty(field)) {
+            if (doc[field] !== undefined) {
+              newFields[field] = doc[field];
             }
-
-            $scope.telemetry.add(newFields);
-
-            $scope.$apply();
+          }
         }
 
-        coreClient.onMessage('telemetry', eventListener);
+        $scope.telemetry.add(newFields);
 
-        $element.on('$destroy', () => {
-            coreClient.removeListener('telemetry', eventListener);
-        });
-    }]);
+        $scope.$apply();
+      }
+
+      coreClient.onMessage('telemetry', eventListener);
+
+      $element.on('$destroy', () => {
+        coreClient.removeListener('telemetry', eventListener);
+      });
+    }
+  ]);

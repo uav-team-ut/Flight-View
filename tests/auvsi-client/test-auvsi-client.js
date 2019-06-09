@@ -20,865 +20,845 @@ const childProcess = require('child_process');
 const request = require('request');
 const fs = require('fs');
 
-describe('AUVSIClient', function () {
-    const AUVSIClient = require('../../core/net/auvsi-client');
+describe('AUVSIClient', function() {
+  const AUVSIClient = require('../../core/net/auvsi-client');
 
-    this.bail(true);
+  this.bail(true);
 
-    before(function (done) {
-        this.timeout(0);
+  before(function(done) {
+    this.timeout(0);
 
-        let stoppedAttempt = false;
+    let stoppedAttempt = false;
 
-        let cancel;
-        let child;
+    let cancel;
+    let child;
 
-        function connect() {
-            let options = {
-                url: 'http://localhost:8080/api/login',
-                form: {
-                    username: '',
-                    password: ''
-                }
-            };
+    function connect() {
+      let options = {
+        url: 'http://localhost:8080/api/login',
+        form: {
+          username: '',
+          password: ''
+        }
+      };
 
-            request.post(options, (error, response, body) => {
-                if (!error && response.statusCode === 400) {
-                    clearTimeout(cancel);
+      request.post(options, (error, response, body) => {
+        if (!error && response.statusCode === 400) {
+          clearTimeout(cancel);
 
-                    done();
-                } else {
-                    setTimeout(connect, 1000);
-                }
-            });
-        };
+          done();
+        } else {
+          setTimeout(connect, 1000);
+        }
+      });
+    }
 
-        function start() {
-            childProcess.spawnSync('docker', ['rm', 'test-auvsi', '-f']);
+    function start() {
+      childProcess.spawnSync('docker', ['rm', 'test-auvsi', '-f']);
 
-            let startDocker = 'docker run -d -i -t -p 8080:80 --name' +
-                    ' test-auvsi auvsisuas/interop-server';
+      let startDocker =
+        'docker run -d -i -t -p 8080:80 --name' +
+        ' test-auvsi auvsisuas/interop-server';
 
-            child = childProcess.exec(startDocker, (error, stdout, stderr) => {
-                if (error) {
-                    throw error;
-                }
-
-                if (stderr !== '') {
-                    throw new Error(`Error starting docker server: ${stderr}`);
-                }
-
-                connect();
-            });
+      child = childProcess.exec(startDocker, (error, stdout, stderr) => {
+        if (error) {
+          throw error;
         }
 
-        cancel = setTimeout(() => {
-            process.exit(50);
-        }, 60000);
+        if (stderr !== '') {
+          throw new Error(`Error starting docker server: ${stderr}`);
+        }
 
-        start();
+        connect();
+      });
+    }
+
+    cancel = setTimeout(() => {
+      process.exit(50);
+    }, 60000);
+
+    start();
+  });
+
+  after(function(done) {
+    this.timeout(0);
+
+    let stopDocker = 'docker rm -f test-auvsi';
+
+    childProcess.exec(stopDocker, (error, stdout, stderr) => {
+      if (error) {
+        throw error;
+      }
+
+      if (stderr !== '') {
+        throw new Error(`Error stopping docker server: ${stderr}`);
+      }
+
+      done();
+    });
+  });
+
+  describe('#login()', function() {
+    it('should return an error if URL is invalid', function(done) {
+      let client = new AUVSIClient();
+
+      client.login('invalid url', '', '', (error) => {
+        assert.ok(error);
+        assert.strictEqual(error.message, 'Invalid URL');
+
+        done();
+      });
     });
 
-    after(function (done) {
-        this.timeout(0);
+    it('should return an error if connection is refused', function(done) {
+      let client = new AUVSIClient();
 
-        let stopDocker = 'docker rm -f test-auvsi';
+      client.login('http://localhost:8001', '', '', (error) => {
+        assert.ok(error);
+        assert.strictEqual(error.message, 'Connection refused');
 
-        childProcess.exec(stopDocker, (error, stdout, stderr) => {
-            if (error) {
-                throw error;
-            }
-
-            if (stderr !== '') {
-                throw new Error(`Error stopping docker server: ${stderr}`);
-            }
-
-            done();
-        });
+        done();
+      });
     });
 
-    describe('#login()', function () {
-        it('should return an error if URL is invalid', function (done) {
-            let client = new AUVSIClient();
+    it('should return an error if username and password are invalid', function(done) {
+      let client = new AUVSIClient();
 
-            client.login('invalid url', '', '', (error) => {
-                assert.ok(error);
-                assert.strictEqual(error.message, 'Invalid URL');
+      client.login(
+        'http://localhost:8080',
+        'wronguser',
+        'wrongpass',
+        (error) => {
+          assert.ok(error);
+          assert.strictEqual(error.message, 'Invalid login');
 
-                done();
-            });
-        });
-
-        it('should return an error if connection is refused', function (done) {
-            let client = new AUVSIClient();
-
-            client.login('http://localhost:8001', '', '', (error) => {
-                assert.ok(error);
-                assert.strictEqual(error.message, 'Connection refused');
-
-                done();
-            });
-        });
-
-        it('should return an error if username and password are invalid',
-                function (done) {
-            let client = new AUVSIClient();
-
-            client.login('http://localhost:8080', 'wronguser', 'wrongpass',
-                    (error) => {
-                assert.ok(error);
-                assert.strictEqual(error.message, 'Invalid login');
-
-                done();
-            });
-        });
-
-        it('should return null with valid URL and default user credentials',
-                function (done) {
-            let client = new AUVSIClient();
-
-            client.login('http://localhost:8080', 'testuser', 'testpass',
-                    done);
-        });
-
-        it('should return null with valid URL and default admin credentials',
-                function (done) {
-            let client = new AUVSIClient();
-
-            client.login('http://localhost:8080', 'testadmin', 'testpass',
-                    done);
-        });
+          done();
+        }
+      );
     });
 
-    describe('#getMissions()', function () {
-        let client;
+    it('should return null with valid URL and default user credentials', function(done) {
+      let client = new AUVSIClient();
 
-        beforeEach(function (done) {
-            client = new AUVSIClient();
-
-            client.login('http://localhost:8080', 'testuser', 'testpass',
-                    (error) => {
-                done();
-            });
-        });
-
-        it('should return an error if not logged in', function (done) {
-            client = new AUVSIClient();
-
-            client.getMissions((error, missions) => {
-                assert.ok(error);
-                assert.strictEqual(error.message, 'Not logged in');
-
-                done();
-            });
-        });
-
-        it('should return an error if connection is refused', function (done) {
-            client._url = 'http://localhost:8001';
-
-            client.getMissions((error, missions) => {
-                assert.ok(error);
-                assert.strictEqual(error.message, 'Connection refused');
-
-                done();
-            });
-        });
-
-        it('should return a list with one mission', function (done) {
-            client.getMissions((error, missions) => {
-                assert.ifError(error);
-                assert.strictEqual(missions.length, 1);
-                assert.equal(missions[0].hasOwnProperty('mission_waypoints'),
-                        true);
-
-                done();
-            });
-        });
+      client.login('http://localhost:8080', 'testuser', 'testpass', done);
     });
 
-    describe('#getMission()', function () {
-        let client;
+    it('should return null with valid URL and default admin credentials', function(done) {
+      let client = new AUVSIClient();
 
-        beforeEach(function (done) {
-            client = new AUVSIClient();
+      client.login('http://localhost:8080', 'testadmin', 'testpass', done);
+    });
+  });
 
-            client.login('http://localhost:8080', 'testuser', 'testpass',
-                    (error) => {
-                done();
-            });
-        });
+  describe('#getMissions()', function() {
+    let client;
 
-        it('should return an error if not logged in', function (done) {
-            client = new AUVSIClient();
+    beforeEach(function(done) {
+      client = new AUVSIClient();
 
-            client.getMission(1, (error, mission) => {
-                assert.ok(error);
-                assert.strictEqual(error.message, 'Not logged in');
-
-                done();
-            });
-        });
-
-        it('should return an error if connection is refused', function (done) {
-            client._url = 'http://localhost:8001';
-
-            client.getMission(1, (error, mission) => {
-                assert.ok(error);
-                assert.strictEqual(error.message, 'Connection refused');
-
-                done();
-            });
-        });
-
-        it('should return a mission with id 1', function (done) {
-            client.getMission(1, (error, mission) => {
-                assert.ifError(error);
-                assert.strictEqual(mission.id, 1);
-                assert.strictEqual(mission.hasOwnProperty('mission_waypoints'),
-                        true);
-
-                done();
-            });
-        });
+      client.login('http://localhost:8080', 'testuser', 'testpass', (error) => {
+        done();
+      });
     });
 
-    describe('#getObstacles()', function () {
-        let client;
+    it('should return an error if not logged in', function(done) {
+      client = new AUVSIClient();
 
-        beforeEach(function (done) {
-            client = new AUVSIClient();
+      client.getMissions((error, missions) => {
+        assert.ok(error);
+        assert.strictEqual(error.message, 'Not logged in');
 
-            client.login('http://localhost:8080', 'testuser', 'testpass',
-                    (error) => {
-                done();
-            });
-        });
-
-        it('should return an error if not logged in', function (done) {
-            client = new AUVSIClient();
-
-            client.getObstacles((error, obstacles) => {
-                assert.ok(error);
-                assert.strictEqual(error.message, 'Not logged in');
-
-                done();
-            });
-        });
-
-        it('should return an error if connection is refused', function (done) {
-            client._url = 'http://localhost:8001';
-
-            client.getObstacles((error, obstacles) => {
-                assert.ok(error);
-                assert.strictEqual(error.message, 'Connection refused');
-
-                done();
-            });
-        });
-
-        it('should return a set of obstacles', function (done) {
-            client.getObstacles((error, obstacles) => {
-                assert.ifError(error);
-                assert.equal(obstacles.hasOwnProperty('stationary_obstacles'),
-                        true);
-
-                done();
-            });
-        });
+        done();
+      });
     });
 
-    describe('#postTelemetry()', function () {
-        let client;
-        let telemetry;
+    it('should return an error if connection is refused', function(done) {
+      client._url = 'http://localhost:8001';
 
-        beforeEach(function (done) {
-            client = new AUVSIClient();
+      client.getMissions((error, missions) => {
+        assert.ok(error);
+        assert.strictEqual(error.message, 'Connection refused');
 
-            client.login('http://localhost:8080', 'testuser', 'testpass',
-                    (error) => {
-                telemetry = {
-                    latitude: 12.123456789,
-                    longitude: 12.123456789,
-                    altitude_msl: 12.123456789,
-                    uas_heading: 12.123456789
-                };
-
-                done();
-            });
-        });
-
-        it('should return an error if not logged in', function (done) {
-            client = new AUVSIClient();
-
-            client.postTelemetry(telemetry, (error) => {
-                assert.ok(error);
-                assert.strictEqual(error.message, 'Not logged in');
-
-                done();
-            });
-        });
-
-        it('should return an error if connection is refused', function (done) {
-            client._url = 'http://localhost:8001';
-
-            client.postTelemetry(telemetry, (error) => {
-                assert.ok(error);
-                assert.strictEqual(error.message, 'Connection refused');
-
-                done();
-            });
-        });
-
-        it('should return an error if telemetry is missing keys',
-                function (done) {
-            delete telemetry.latitude;
-
-            client.postTelemetry(telemetry, (error) => {
-                assert.ok(error);
-                assert.strictEqual(error.message,
-                        'Telemetry is missing key \'latitude\'');
-
-                done();
-            });
-        });
-
-        it('should return an error if telemetry has extra keys',
-                function (done) {
-            telemetry.extra = 0;
-
-            client.postTelemetry(telemetry, (error) => {
-                assert.ok(error);
-                assert.strictEqual(error.message,
-                        'Telemetry contains too many keys');
-
-                done();
-            });
-        });
-
-        it('should return an error if telemetry has a key of the wrong type',
-                function (done) {
-            telemetry.latitude = 'string';
-
-            client.postTelemetry(telemetry, (error) => {
-                assert.ok(error);
-                assert.strictEqual(error.message,
-                        'key \'latitude\' is the wrong type');
-
-                done();
-            });
-        });
-
-        it('should return null with valid telemetry', function (done) {
-            client.postTelemetry(telemetry, done);
-        });
+        done();
+      });
     });
 
-    describe('#postTarget()', function () {
-        let client;
-        let target;
+    it('should return a list with one mission', function(done) {
+      client.getMissions((error, missions) => {
+        assert.ifError(error);
+        assert.strictEqual(missions.length, 1);
+        assert.equal(missions[0].hasOwnProperty('mission_waypoints'), true);
 
-        beforeEach(function (done) {
-            client = new AUVSIClient();
+        done();
+      });
+    });
+  });
 
-            client.login('http://localhost:8080', 'testuser', 'testpass',
-                    (error) => {
-                target = {
-                    type: 'standard',
-                    latitude: 12.23456789,
-                    longitude: 12.23456789,
-                    orientation: 'n',
-                    shape: 'square',
-                    background_color: 'blue',
-                    alphanumeric: 'A',
-                    alphanumeric_color: 'white',
-                    description: 'desc',
-                    autonomous: true
-                };
+  describe('#getMission()', function() {
+    let client;
 
-                done();
-            });
-        });
+    beforeEach(function(done) {
+      client = new AUVSIClient();
 
-        it('should return an error if not logged in', function (done) {
-            client = new AUVSIClient();
-
-            client.postTarget(target, (error) => {
-                assert.ok(error);
-                assert.strictEqual(error.message, 'Not logged in');
-
-                done();
-            });
-        });
-
-        it('should return an error if connection is refused', function (done) {
-            client._url = 'http://localhost:8001';
-
-            client.postTarget(target, (error, target) => {
-                assert.ok(error);
-                assert.strictEqual(error.message, 'Connection refused');
-
-                done();
-            });
-        });
-
-        it('should return an error if target has extra keys', function (done) {
-            target.extra = 0;
-
-            client.postTarget(target, (error, target) => {
-                assert.ok(error);
-                assert.strictEqual(error.message,
-                        'Target contains extra key \'extra\'');
-
-                done();
-            });
-        });
-
-        it('should return an error if target has a key of the wrong type',
-                function (done) {
-            target.description = 0;
-
-            client.postTarget(target, (error, target) => {
-                assert.ok(error);
-                assert.strictEqual(error.message,
-                        'key \'description\' is the wrong type');
-
-                done();
-            });
-        });
-
-        it('should return a target if target is missing keys',
-                function (done) {
-            delete target.description;
-
-            client.postTarget(target, (error, target) => {
-                assert.ifError(error);
-                assert.equal(target.hasOwnProperty('description'), true);
-
-                done();
-            });
-        });
-
-        it('should return a target with valid target', function (done) {
-            client.postTarget(target, (error, target) => {
-                assert.ifError(error);
-                assert.equal(target.hasOwnProperty('description'), true);
-
-                done();
-            });
-        });
+      client.login('http://localhost:8080', 'testuser', 'testpass', (error) => {
+        done();
+      });
     });
 
-    describe('#getTargets()', function () {
-        // TODO: When getTarget() is working, don't skip this
-        // test suite
-        before(function() {
-            this.skip();
-        });
+    it('should return an error if not logged in', function(done) {
+      client = new AUVSIClient();
 
-        let client;
+      client.getMission(1, (error, mission) => {
+        assert.ok(error);
+        assert.strictEqual(error.message, 'Not logged in');
 
-        beforeEach(function (done) {
-            client = new AUVSIClient();
-
-            client.login('http://localhost:8080', 'testuser', 'testpass',
-                    (error) => {
-                done();
-            });
-        });
-
-        it('should return an error if not logged in', function (done) {
-            client = new AUVSIClient();
-
-            client.getTargets((error, targets) => {
-                assert.ok(error);
-                assert.strictEqual(error.message, 'Not logged in');
-
-                done();
-            });
-        });
-
-        it('should return an error if connection is refused', function (done) {
-            client._url = 'http://localhost:8001';
-
-            client.getTargets((error, targets) => {
-                assert.ok(error);
-                assert.strictEqual(error.message, 'Connection refused');
-
-                done();
-            });
-        });
-
-        it('should return a list with two targets', function (done) {
-            client.getTargets((error, targets) => {
-                assert.ifError(error);
-
-                assert.strictEqual(targets.length, 2);
-                assert.equal(targets[0].hasOwnProperty('description'), true);
-
-                done();
-            });
-        });
+        done();
+      });
     });
 
-    describe('#getTarget()', function () {
-        let client;
+    it('should return an error if connection is refused', function(done) {
+      client._url = 'http://localhost:8001';
 
-        beforeEach(function (done) {
-            client = new AUVSIClient();
+      client.getMission(1, (error, mission) => {
+        assert.ok(error);
+        assert.strictEqual(error.message, 'Connection refused');
 
-            client.login('http://localhost:8080', 'testuser', 'testpass',
-                    (error) => {
-                done();
-            });
-        });
-
-        it('should return an error if not logged in', function (done) {
-            client = new AUVSIClient();
-
-            client.getTarget(1, (error, target) => {
-                assert.ok(error);
-                assert.strictEqual(error.message, 'Not logged in');
-
-                done();
-            });
-        });
-
-        it('should return an error if connection is refused', function (done) {
-            client._url = 'http://localhost:8001';
-
-            client.getTarget(1, (error, target) => {
-                assert.ok(error);
-                assert.strictEqual(error.message, 'Connection refused');
-
-                done();
-            });
-        });
-
-        it('should return a target with id 1', function (done) {
-            client.getTarget(1, (error, target) => {
-                assert.ifError(error);
-                assert.strictEqual(target.id, 1);
-                assert.strictEqual(target.hasOwnProperty('description'), true);
-
-                done();
-            });
-        });
+        done();
+      });
     });
 
-    describe('#putTarget()', function () {
-        let client;
-        let target;
+    it('should return a mission with id 1', function(done) {
+      client.getMission(1, (error, mission) => {
+        assert.ifError(error);
+        assert.strictEqual(mission.id, 1);
+        assert.strictEqual(mission.hasOwnProperty('mission_waypoints'), true);
 
-        beforeEach(function (done) {
-            client = new AUVSIClient();
+        done();
+      });
+    });
+  });
 
-            client.login('http://localhost:8080', 'testuser', 'testpass',
-                    (error) => {
-                target = {
-                    type: 'standard',
-                    latitude: 12.23456789,
-                    longitude: 12.23456789,
-                    orientation: 'n',
-                    shape: 'square',
-                    background_color: 'blue',
-                    alphanumeric: 'A',
-                    alphanumeric_color: 'white',
-                    description: 'desc',
-                    autonomous: true
-                }
+  describe('#getObstacles()', function() {
+    let client;
 
-                done();
-            });
-        });
+    beforeEach(function(done) {
+      client = new AUVSIClient();
 
-        it('should return an error if not logged in', function (done) {
-            client = new AUVSIClient();
-
-            client.putTarget(1, target, (error) => {
-                assert.ok(error);
-                assert.strictEqual(error.message, 'Not logged in');
-
-                done();
-            });
-        });
-
-        it('should return an error if connection is refused', function (done) {
-            client._url = 'http://localhost:8001';
-
-            client.putTarget(1, target, (error, target) => {
-                assert.ok(error);
-                assert.strictEqual(error.message, 'Connection refused');
-
-                done();
-            });
-        });
-
-        it('should return an error if target has extra keys', function (done) {
-            target.extra = 0;
-
-            client.putTarget(1, target, (error, target) => {
-                assert.ok(error);
-                assert.strictEqual(error.message,
-                        'Target contains extra key \'extra\'');
-
-                done();
-            });
-        });
-
-        it('should return an error if target has a key of the wrong type',
-                function (done) {
-            target.description = 0;
-
-            client.putTarget(1, target, (error, target) => {
-                assert.ok(error);
-                assert.strictEqual(error.message,
-                        'key \'description\' is the wrong type');
-
-                done();
-            });
-        });
-
-        it('should return a target if target is missing keys',
-                function (done) {
-            delete target.description;
-
-            client.putTarget(1, target, (error, target) => {
-                assert.ifError(error);
-                assert.strictEqual(target.id, 1);
-                assert.equal(target.hasOwnProperty('description'), true);
-
-                done();
-            });
-        });
-
-        it('should return a target with valid target', function (done) {
-            client.putTarget(1, target, (error, target) => {
-                assert.ifError(error);
-                assert.strictEqual(target.id, 1);
-                assert.equal(target.hasOwnProperty('description'), true);
-
-                done();
-            });
-        });
+      client.login('http://localhost:8080', 'testuser', 'testpass', (error) => {
+        done();
+      });
     });
 
-    describe('#deleteTarget()', function () {
-        let client;
+    it('should return an error if not logged in', function(done) {
+      client = new AUVSIClient();
 
-        beforeEach(function (done) {
-            client = new AUVSIClient();
+      client.getObstacles((error, obstacles) => {
+        assert.ok(error);
+        assert.strictEqual(error.message, 'Not logged in');
 
-            client.login('http://localhost:8080', 'testuser', 'testpass',
-                    (error) => {
-                done();
-            });
-        });
-
-        it('should return an error if not logged in', function (done) {
-            client = new AUVSIClient();
-
-            client.deleteTarget(1, (error) => {
-                assert.ok(error);
-                assert.strictEqual(error.message, 'Not logged in');
-
-                done();
-            });
-        });
-
-        it('should return an error if connection is refused', function (done) {
-            client._url = 'http://localhost:8001';
-
-            client.deleteTarget(1, (error) => {
-                assert.ok(error);
-                assert.strictEqual(error.message, 'Connection refused');
-
-                done();
-            });
-        });
-
-        it('should return null with id 1', function (done) {
-            client.deleteTarget(1, done);
-        });
+        done();
+      });
     });
 
-    describe('#postTargetImage()', function () {
-        let client;
-        let image;
+    it('should return an error if connection is refused', function(done) {
+      client._url = 'http://localhost:8001';
 
-        beforeEach(function (done) {
-            client = new AUVSIClient();
+      client.getObstacles((error, obstacles) => {
+        assert.ok(error);
+        assert.strictEqual(error.message, 'Connection refused');
 
-            client.login('http://localhost:8080', 'testuser', 'testpass',
-                    (error) => {
-                done();
-            });
-
-            image = Buffer.from(
-                    fs.readFileSync(__dirname + '/test-image-1.png'))
-                    .toString('base64');
-        });
-
-        it('should return an error if not logged in', function (done) {
-            client = new AUVSIClient();
-
-            client.postTargetImage(2, image, (error) => {
-                assert.ok(error);
-                assert.strictEqual(error.message, 'Not logged in');
-
-                done();
-            });
-        });
-
-        it('should return an error if connection is refused', function (done) {
-            client._url = 'http://localhost:8001';
-
-            client.postTargetImage(2, image, (error) => {
-                assert.ok(error);
-                assert.strictEqual(error.message, 'Connection refused');
-
-                done();
-            });
-        });
-
-        it('should return null with id 2 and valid base 64 png',
-                function (done) {
-            client.postTargetImage(2, image, done);
-        });
+        done();
+      });
     });
 
-    describe('#getTargetImage()', function () {
-        // TODO: When getTargetImage() is finished, don't skip this
-        // test suite
-        before(function() {
-            this.skip();
-        });
+    it('should return a set of obstacles', function(done) {
+      client.getObstacles((error, obstacles) => {
+        assert.ifError(error);
+        assert.equal(obstacles.hasOwnProperty('stationary_obstacles'), true);
 
-        let client;
+        done();
+      });
+    });
+  });
 
-        beforeEach(function (done) {
-            client = new AUVSIClient();
+  describe('#postTelemetry()', function() {
+    let client;
+    let telemetry;
 
-            client.login('http://localhost:8080', 'testuser', 'testpass',
-                    (error) => {
-                done();
-            });
-        });
+    beforeEach(function(done) {
+      client = new AUVSIClient();
 
-        it('should return an error if not logged in', function (done) {
-            client = new AUVSIClient();
+      client.login('http://localhost:8080', 'testuser', 'testpass', (error) => {
+        telemetry = {
+          latitude: 12.123456789,
+          longitude: 12.123456789,
+          altitude_msl: 12.123456789,
+          uas_heading: 12.123456789
+        };
 
-            client.getTargetImage(2, (error, image) => {
-                assert.ok(error);
-                assert.strictEqual(error.message, 'Not logged in');
-
-                done();
-            });
-        });
-
-        it('should return an error if connection is refused', function (done) {
-            client._url = 'http://localhost:8001';
-
-            client.getTargetImage(2, (error, image) => {
-                assert.ok(error);
-                assert.strictEqual(error.message, 'Connection refused');
-
-                done();
-            });
-        });
-
-        it('should return a valid base 64 png with id 2', function (done) {
-            client.getTargetImage(2, (error, image) => {
-                assert.ifError(error);
-                assert.strictEqual(image, Buffer.from(
-                    fs.readFileSync(__dirname + '/test-image-1.png'))
-                    .toString('base64'));
-
-                done();
-            });
-        });
+        done();
+      });
     });
 
-    describe('#putTargetImage()', function () {
-        let client;
-        let image;
+    it('should return an error if not logged in', function(done) {
+      client = new AUVSIClient();
 
-        beforeEach(function (done) {
-            client = new AUVSIClient();
+      client.postTelemetry(telemetry, (error) => {
+        assert.ok(error);
+        assert.strictEqual(error.message, 'Not logged in');
 
-            client.login('http://localhost:8080', 'testuser', 'testpass',
-                    (error) => {
-                done();
-            });
-
-            image = Buffer.from(
-                    fs.readFileSync(__dirname + '/test-image-2.png'))
-                    .toString('base64');
-        });
-
-        it('should return an error if not logged in', function (done) {
-            client = new AUVSIClient();
-
-            client.putTargetImage(2, image, (error) => {
-                assert.ok(error);
-                assert.strictEqual(error.message, 'Not logged in');
-
-                done();
-            });
-        });
-
-        it('should return an error if connection is refused', function (done) {
-            client._url = 'http://localhost:8001';
-
-            client.putTargetImage(2, image, (error) => {
-                assert.ok(error);
-                assert.strictEqual(error.message, 'Connection refused');
-
-                done();
-            });
-        });
-
-        it('should return null with id 2 and valid base 64 png',
-                function (done) {
-            client.putTargetImage(2, image, done);
-        });
+        done();
+      });
     });
 
-    describe('#deleteTargetImage()', function () {
-        let client;
+    it('should return an error if connection is refused', function(done) {
+      client._url = 'http://localhost:8001';
 
-        beforeEach(function (done) {
-            client = new AUVSIClient();
+      client.postTelemetry(telemetry, (error) => {
+        assert.ok(error);
+        assert.strictEqual(error.message, 'Connection refused');
 
-            client.login('http://localhost:8080', 'testuser', 'testpass',
-                    (error) => {
-                done();
-            });
-        });
-
-        it('should return an error if not logged in', function (done) {
-            client = new AUVSIClient();
-
-            client.deleteTargetImage(2, (error) => {
-                assert.ok(error);
-                assert.strictEqual(error.message, 'Not logged in');
-
-                done();
-            });
-        });
-
-        it('should return an error if connection is refused', function (done) {
-            client._url = 'http://localhost:8001';
-
-            client.deleteTargetImage(2, (error) => {
-                assert.ok(error);
-                assert.strictEqual(error.message, 'Connection refused');
-
-                done();
-            });
-        });
-
-        it('should return null with id 2', function (done) {
-            client.deleteTargetImage(2, done);
-        });
+        done();
+      });
     });
+
+    it('should return an error if telemetry is missing keys', function(done) {
+      delete telemetry.latitude;
+
+      client.postTelemetry(telemetry, (error) => {
+        assert.ok(error);
+        assert.strictEqual(
+          error.message,
+          "Telemetry is missing key 'latitude'"
+        );
+
+        done();
+      });
+    });
+
+    it('should return an error if telemetry has extra keys', function(done) {
+      telemetry.extra = 0;
+
+      client.postTelemetry(telemetry, (error) => {
+        assert.ok(error);
+        assert.strictEqual(error.message, 'Telemetry contains too many keys');
+
+        done();
+      });
+    });
+
+    it('should return an error if telemetry has a key of the wrong type', function(done) {
+      telemetry.latitude = 'string';
+
+      client.postTelemetry(telemetry, (error) => {
+        assert.ok(error);
+        assert.strictEqual(error.message, "key 'latitude' is the wrong type");
+
+        done();
+      });
+    });
+
+    it('should return null with valid telemetry', function(done) {
+      client.postTelemetry(telemetry, done);
+    });
+  });
+
+  describe('#postTarget()', function() {
+    let client;
+    let target;
+
+    beforeEach(function(done) {
+      client = new AUVSIClient();
+
+      client.login('http://localhost:8080', 'testuser', 'testpass', (error) => {
+        target = {
+          type: 'standard',
+          latitude: 12.23456789,
+          longitude: 12.23456789,
+          orientation: 'n',
+          shape: 'square',
+          background_color: 'blue',
+          alphanumeric: 'A',
+          alphanumeric_color: 'white',
+          description: 'desc',
+          autonomous: true
+        };
+
+        done();
+      });
+    });
+
+    it('should return an error if not logged in', function(done) {
+      client = new AUVSIClient();
+
+      client.postTarget(target, (error) => {
+        assert.ok(error);
+        assert.strictEqual(error.message, 'Not logged in');
+
+        done();
+      });
+    });
+
+    it('should return an error if connection is refused', function(done) {
+      client._url = 'http://localhost:8001';
+
+      client.postTarget(target, (error, target) => {
+        assert.ok(error);
+        assert.strictEqual(error.message, 'Connection refused');
+
+        done();
+      });
+    });
+
+    it('should return an error if target has extra keys', function(done) {
+      target.extra = 0;
+
+      client.postTarget(target, (error, target) => {
+        assert.ok(error);
+        assert.strictEqual(error.message, "Target contains extra key 'extra'");
+
+        done();
+      });
+    });
+
+    it('should return an error if target has a key of the wrong type', function(done) {
+      target.description = 0;
+
+      client.postTarget(target, (error, target) => {
+        assert.ok(error);
+        assert.strictEqual(
+          error.message,
+          "key 'description' is the wrong type"
+        );
+
+        done();
+      });
+    });
+
+    it('should return a target if target is missing keys', function(done) {
+      delete target.description;
+
+      client.postTarget(target, (error, target) => {
+        assert.ifError(error);
+        assert.equal(target.hasOwnProperty('description'), true);
+
+        done();
+      });
+    });
+
+    it('should return a target with valid target', function(done) {
+      client.postTarget(target, (error, target) => {
+        assert.ifError(error);
+        assert.equal(target.hasOwnProperty('description'), true);
+
+        done();
+      });
+    });
+  });
+
+  describe('#getTargets()', function() {
+    // TODO: When getTarget() is working, don't skip this
+    // test suite
+    before(function() {
+      this.skip();
+    });
+
+    let client;
+
+    beforeEach(function(done) {
+      client = new AUVSIClient();
+
+      client.login('http://localhost:8080', 'testuser', 'testpass', (error) => {
+        done();
+      });
+    });
+
+    it('should return an error if not logged in', function(done) {
+      client = new AUVSIClient();
+
+      client.getTargets((error, targets) => {
+        assert.ok(error);
+        assert.strictEqual(error.message, 'Not logged in');
+
+        done();
+      });
+    });
+
+    it('should return an error if connection is refused', function(done) {
+      client._url = 'http://localhost:8001';
+
+      client.getTargets((error, targets) => {
+        assert.ok(error);
+        assert.strictEqual(error.message, 'Connection refused');
+
+        done();
+      });
+    });
+
+    it('should return a list with two targets', function(done) {
+      client.getTargets((error, targets) => {
+        assert.ifError(error);
+
+        assert.strictEqual(targets.length, 2);
+        assert.equal(targets[0].hasOwnProperty('description'), true);
+
+        done();
+      });
+    });
+  });
+
+  describe('#getTarget()', function() {
+    let client;
+
+    beforeEach(function(done) {
+      client = new AUVSIClient();
+
+      client.login('http://localhost:8080', 'testuser', 'testpass', (error) => {
+        done();
+      });
+    });
+
+    it('should return an error if not logged in', function(done) {
+      client = new AUVSIClient();
+
+      client.getTarget(1, (error, target) => {
+        assert.ok(error);
+        assert.strictEqual(error.message, 'Not logged in');
+
+        done();
+      });
+    });
+
+    it('should return an error if connection is refused', function(done) {
+      client._url = 'http://localhost:8001';
+
+      client.getTarget(1, (error, target) => {
+        assert.ok(error);
+        assert.strictEqual(error.message, 'Connection refused');
+
+        done();
+      });
+    });
+
+    it('should return a target with id 1', function(done) {
+      client.getTarget(1, (error, target) => {
+        assert.ifError(error);
+        assert.strictEqual(target.id, 1);
+        assert.strictEqual(target.hasOwnProperty('description'), true);
+
+        done();
+      });
+    });
+  });
+
+  describe('#putTarget()', function() {
+    let client;
+    let target;
+
+    beforeEach(function(done) {
+      client = new AUVSIClient();
+
+      client.login('http://localhost:8080', 'testuser', 'testpass', (error) => {
+        target = {
+          type: 'standard',
+          latitude: 12.23456789,
+          longitude: 12.23456789,
+          orientation: 'n',
+          shape: 'square',
+          background_color: 'blue',
+          alphanumeric: 'A',
+          alphanumeric_color: 'white',
+          description: 'desc',
+          autonomous: true
+        };
+
+        done();
+      });
+    });
+
+    it('should return an error if not logged in', function(done) {
+      client = new AUVSIClient();
+
+      client.putTarget(1, target, (error) => {
+        assert.ok(error);
+        assert.strictEqual(error.message, 'Not logged in');
+
+        done();
+      });
+    });
+
+    it('should return an error if connection is refused', function(done) {
+      client._url = 'http://localhost:8001';
+
+      client.putTarget(1, target, (error, target) => {
+        assert.ok(error);
+        assert.strictEqual(error.message, 'Connection refused');
+
+        done();
+      });
+    });
+
+    it('should return an error if target has extra keys', function(done) {
+      target.extra = 0;
+
+      client.putTarget(1, target, (error, target) => {
+        assert.ok(error);
+        assert.strictEqual(error.message, "Target contains extra key 'extra'");
+
+        done();
+      });
+    });
+
+    it('should return an error if target has a key of the wrong type', function(done) {
+      target.description = 0;
+
+      client.putTarget(1, target, (error, target) => {
+        assert.ok(error);
+        assert.strictEqual(
+          error.message,
+          "key 'description' is the wrong type"
+        );
+
+        done();
+      });
+    });
+
+    it('should return a target if target is missing keys', function(done) {
+      delete target.description;
+
+      client.putTarget(1, target, (error, target) => {
+        assert.ifError(error);
+        assert.strictEqual(target.id, 1);
+        assert.equal(target.hasOwnProperty('description'), true);
+
+        done();
+      });
+    });
+
+    it('should return a target with valid target', function(done) {
+      client.putTarget(1, target, (error, target) => {
+        assert.ifError(error);
+        assert.strictEqual(target.id, 1);
+        assert.equal(target.hasOwnProperty('description'), true);
+
+        done();
+      });
+    });
+  });
+
+  describe('#deleteTarget()', function() {
+    let client;
+
+    beforeEach(function(done) {
+      client = new AUVSIClient();
+
+      client.login('http://localhost:8080', 'testuser', 'testpass', (error) => {
+        done();
+      });
+    });
+
+    it('should return an error if not logged in', function(done) {
+      client = new AUVSIClient();
+
+      client.deleteTarget(1, (error) => {
+        assert.ok(error);
+        assert.strictEqual(error.message, 'Not logged in');
+
+        done();
+      });
+    });
+
+    it('should return an error if connection is refused', function(done) {
+      client._url = 'http://localhost:8001';
+
+      client.deleteTarget(1, (error) => {
+        assert.ok(error);
+        assert.strictEqual(error.message, 'Connection refused');
+
+        done();
+      });
+    });
+
+    it('should return null with id 1', function(done) {
+      client.deleteTarget(1, done);
+    });
+  });
+
+  describe('#postTargetImage()', function() {
+    let client;
+    let image;
+
+    beforeEach(function(done) {
+      client = new AUVSIClient();
+
+      client.login('http://localhost:8080', 'testuser', 'testpass', (error) => {
+        done();
+      });
+
+      image = Buffer.from(
+        fs.readFileSync(__dirname + '/test-image-1.png')
+      ).toString('base64');
+    });
+
+    it('should return an error if not logged in', function(done) {
+      client = new AUVSIClient();
+
+      client.postTargetImage(2, image, (error) => {
+        assert.ok(error);
+        assert.strictEqual(error.message, 'Not logged in');
+
+        done();
+      });
+    });
+
+    it('should return an error if connection is refused', function(done) {
+      client._url = 'http://localhost:8001';
+
+      client.postTargetImage(2, image, (error) => {
+        assert.ok(error);
+        assert.strictEqual(error.message, 'Connection refused');
+
+        done();
+      });
+    });
+
+    it('should return null with id 2 and valid base 64 png', function(done) {
+      client.postTargetImage(2, image, done);
+    });
+  });
+
+  describe('#getTargetImage()', function() {
+    // TODO: When getTargetImage() is finished, don't skip this
+    // test suite
+    before(function() {
+      this.skip();
+    });
+
+    let client;
+
+    beforeEach(function(done) {
+      client = new AUVSIClient();
+
+      client.login('http://localhost:8080', 'testuser', 'testpass', (error) => {
+        done();
+      });
+    });
+
+    it('should return an error if not logged in', function(done) {
+      client = new AUVSIClient();
+
+      client.getTargetImage(2, (error, image) => {
+        assert.ok(error);
+        assert.strictEqual(error.message, 'Not logged in');
+
+        done();
+      });
+    });
+
+    it('should return an error if connection is refused', function(done) {
+      client._url = 'http://localhost:8001';
+
+      client.getTargetImage(2, (error, image) => {
+        assert.ok(error);
+        assert.strictEqual(error.message, 'Connection refused');
+
+        done();
+      });
+    });
+
+    it('should return a valid base 64 png with id 2', function(done) {
+      client.getTargetImage(2, (error, image) => {
+        assert.ifError(error);
+        assert.strictEqual(
+          image,
+          Buffer.from(
+            fs.readFileSync(__dirname + '/test-image-1.png')
+          ).toString('base64')
+        );
+
+        done();
+      });
+    });
+  });
+
+  describe('#putTargetImage()', function() {
+    let client;
+    let image;
+
+    beforeEach(function(done) {
+      client = new AUVSIClient();
+
+      client.login('http://localhost:8080', 'testuser', 'testpass', (error) => {
+        done();
+      });
+
+      image = Buffer.from(
+        fs.readFileSync(__dirname + '/test-image-2.png')
+      ).toString('base64');
+    });
+
+    it('should return an error if not logged in', function(done) {
+      client = new AUVSIClient();
+
+      client.putTargetImage(2, image, (error) => {
+        assert.ok(error);
+        assert.strictEqual(error.message, 'Not logged in');
+
+        done();
+      });
+    });
+
+    it('should return an error if connection is refused', function(done) {
+      client._url = 'http://localhost:8001';
+
+      client.putTargetImage(2, image, (error) => {
+        assert.ok(error);
+        assert.strictEqual(error.message, 'Connection refused');
+
+        done();
+      });
+    });
+
+    it('should return null with id 2 and valid base 64 png', function(done) {
+      client.putTargetImage(2, image, done);
+    });
+  });
+
+  describe('#deleteTargetImage()', function() {
+    let client;
+
+    beforeEach(function(done) {
+      client = new AUVSIClient();
+
+      client.login('http://localhost:8080', 'testuser', 'testpass', (error) => {
+        done();
+      });
+    });
+
+    it('should return an error if not logged in', function(done) {
+      client = new AUVSIClient();
+
+      client.deleteTargetImage(2, (error) => {
+        assert.ok(error);
+        assert.strictEqual(error.message, 'Not logged in');
+
+        done();
+      });
+    });
+
+    it('should return an error if connection is refused', function(done) {
+      client._url = 'http://localhost:8001';
+
+      client.deleteTargetImage(2, (error) => {
+        assert.ok(error);
+        assert.strictEqual(error.message, 'Connection refused');
+
+        done();
+      });
+    });
+
+    it('should return null with id 2', function(done) {
+      client.deleteTargetImage(2, done);
+    });
+  });
 });

@@ -1,5 +1,5 @@
 {
-    "name": "core",
-    "main": "core.js",
-    "private": true
+  "name": "core",
+  "main": "core.js",
+  "private": true
 }

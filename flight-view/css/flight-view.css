@@ -1,64 +1,67 @@
-.panel, .btn {
+.panel,
+.btn {
   border-radius: 0 !important;
 }
 
 .navbar {
-    min-height: 50px;
+  min-height: 50px;
 }
 
 .navbar-fixed-top {
-    height: 50px;
+  height: 50px;
 }
 
 .navbar-default .navbar-brand {
-    width: 80px;
-    background-color: gray;
+  width: 80px;
+  background-color: gray;
 }
 
-.navbar-default .navbar-brand:hover, .navbar-default .navbar-brand:focus {
-    background-color: darkgray;
+.navbar-default .navbar-brand:hover,
+.navbar-default .navbar-brand:focus {
+  background-color: darkgray;
 }
 
 .navbar-fixed-left {
-    width: 80px;
-    height: 100%;
-    padding-top: 50px;
-    position: fixed;
-    border-radius: 0;
+  width: 80px;
+  height: 100%;
+  padding-top: 50px;
+  position: fixed;
+  border-radius: 0;
 }
 
 .navbar-fixed-left .navbar-nav > li {
-    float: none;
-    width: 79px;
+  float: none;
+  width: 79px;
 }
 
 .navbar-fixed-left + .container {
-    width: 100%;
-    height: 100%;
-    padding-left: 80px;
-    padding-top: 50px;
+  width: 100%;
+  height: 100%;
+  padding-left: 80px;
+  padding-top: 50px;
 }
 
-.btn:hover, .btn:focus {
-    outline: 0 !important;
+.btn:hover,
+.btn:focus {
+  outline: 0 !important;
 }
 
 .btn-margin-left {
-    margin-left: 15px;
+  margin-left: 15px;
 }
 
 #top-left-icon {
-    width: 45px;
-    height: 30px;
-    position: relative;
-    left: 3px;
-    bottom: 5px;
+  width: 45px;
+  height: 30px;
+  position: relative;
+  left: 3px;
+  bottom: 5px;
 }
 
 .main-container {
-    position: absolute;
-    top: 50px;
-    bottom: 0px;
-    left: 0px;
-    right: 0px;
-};
+  position: absolute;
+  top: 50px;
+  bottom: 0px;
+  left: 0px;
+  right: 0px;
+}

@@ -1,5 +1,5 @@
 {
-    "name": "host-server",
-    "main": "host-server.js",
-    "private": true
+  "name": "host-server",
+  "main": "host-server.js",
+  "private": true
 }
