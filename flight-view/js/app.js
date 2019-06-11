@@ -6,7 +6,6 @@ const angularSanitize = require('angular-sanitize');
 const angularUIBootstrap = require('angular-ui-bootstrap');
 
 const IPCClient = require('./ipc-client');
-const Telemetry = require('../../util/types/telemetry');
 
 let coreClient = new IPCClient('flight-view', 'core');
 
@@ -45,7 +44,6 @@ angular
 
         // TODO: Verify that the server started successfully
         $scope.started = true;
-        $scope.canLogIn = true;
       };
 
       $scope.stop = () => {
@@ -56,32 +54,7 @@ angular
 
         // TODO: Verify that the server stopped successfully
         $scope.started = false;
-        $scope.canLogIn = false;
       };
-
-      $scope.canLogIn = false;
-
-      $scope.loginInterop = (url, username, password) => {
-        coreClient.send({
-          type: 'login.request',
-          message: {
-            url: url,
-            username: username,
-            password: password
-          }
-        });
-      };
-
-      coreClient.onMessage('login.fail', (message) => {
-        console.log(message);
-      });
-
-      coreClient.onMessage('login.success', (message) => {
-        $scope.canLogIn = false;
-        $scope.loggedIn = true;
-        console.log('Login success');
-        $scope.$apply();
-      });
     }
   ])
   .controller('TelemetryController', [
@@ -92,21 +65,7 @@ angular
       $scope.telemetry = default_telemetry;
 
       function eventListener(message) {
-        let new_telemetry = Telemetry.deserialize(message);
-
-        let doc = new_telemetry.toDocument();
-        let newFields = {};
-
-        for (let field in doc) {
-          if (doc.hasOwnProperty(field)) {
-            if (doc[field] !== undefined) {
-              newFields[field] = doc[field];
-            }
-          }
-        }
-
-        $scope.telemetry.add(newFields);
-
+        $scope.telemetry = message;
         $scope.$apply();
       }
 

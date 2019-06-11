@@ -2,6 +2,8 @@ const path = require('path');
 
 const remote = require('electron').remote;
 
+const enums = require('util/enums');
+
 const mapboxGL = require('mapbox-gl/dist/mapbox-gl');
 
 const Menu = remote.Menu;
@@ -57,16 +59,16 @@ function buildFlyZoneData(mission) {
   let flyZoneCoordinates = [[[]]];
 
   for (let i = 0; i < flyZones.length; i++) {
-    for (let j = 0; j < flyZones[i].boundary_pts.length; j++) {
+    for (let j = 0; j < flyZones[i].boundary.length; j++) {
       flyZoneCoordinates[i][0].push([
-        flyZones[i].boundary_pts[j].longitude,
-        flyZones[i].boundary_pts[j].latitude
+        flyZones[i].boundary[j].lon,
+        flyZones[i].boundary[j].lat
       ]);
     }
 
     flyZoneCoordinates[i][0].push([
-      flyZones[i].boundary_pts[0].longitude,
-      flyZones[i].boundary_pts[0].latitude
+      flyZones[i].boundary[0].lon,
+      flyZones[i].boundary[0].lat
     ]);
   }
 
@@ -80,20 +82,20 @@ function buildFlyZoneData(mission) {
 }
 
 function buildSearchAreaData(mission) {
-  let searchAreas = mission.search_grid_points;
-  let searchAreaCoordinates = [[]];
+  let searchAreas = mission.search_area;
+  let searchAreaCoordinates = [];
 
   for (let i = 0; i < searchAreas.length; i++) {
-    searchAreaCoordinates[0].push([
-      searchAreas[i].longitude,
-      searchAreas[i].latitude
+    searchAreaCoordinates.push([
+      searchAreas[i].lon,
+      searchAreas[i].lat
     ]);
   }
 
   if (searchAreas.length > 0) {
-    searchAreaCoordinates[0].push([
-      searchAreas[0].longitude,
-      searchAreas[0].latitude
+    searchAreaCoordinates.push([
+      searchAreas[0].lon,
+      searchAreas[0].lat
     ]);
   }
 
@@ -101,19 +103,19 @@ function buildSearchAreaData(mission) {
     type: 'Feature',
     geometry: {
       type: 'Polygon',
-      coordinates: searchAreaCoordinates
+      coordinates: [searchAreaCoordinates]
     }
   };
 }
 
 function buildWaypointsData(mission) {
-  let waypoints = mission.mission_waypoints;
+  let waypoints = mission.waypoints;
   let waypointsCoordinates = [];
 
   waypointsCoordinates.sort((a, b) => parseInt(a.order) - parseInt(b.order));
 
   for (let i = 0; i < waypoints.length; i++) {
-    waypointsCoordinates.push([waypoints[i].longitude, waypoints[i].latitude]);
+    waypointsCoordinates.push([waypoints[i].lon, waypoints[i].lat]);
   }
 
   return {
@@ -128,7 +130,7 @@ function buildWaypointsData(mission) {
 function extractPoint(thing) {
   return {
     type: 'Point',
-    coordinates: [thing.longitude, thing.latitude]
+    coordinates: [thing.lon, thing.lat]
   };
 }
 
@@ -168,13 +170,13 @@ function generateCircle(lat, lon, radius) {
 }
 
 function buildStatObsData(obstacles) {
-  let statObs = obstacles.stationary_obstacles;
+  let statObs = obstacles.stationary;
   let statObsCoordinates = [];
 
   for (let i = 0; i < statObs.length; i++) {
-    let lat = statObs[i].latitude;
-    let lon = statObs[i].longitude;
-    let radius = statObs[i].cylinder_radius * 0.3048;
+    let lat = statObs[i].pos.lat;
+    let lon = statObs[i].pos.lon;
+    let radius = statObs[i].radius * 0.3048;
 
     let circle = generateCircle(lat, lon, radius);
 
@@ -191,13 +193,13 @@ function buildStatObsData(obstacles) {
 }
 
 function buildMovObsData(obstacles) {
-  let movObs = obstacles.moving_obstacles;
+  let movObs = obstacles.moving;
   let movObsCoordinates = [];
 
   for (let i = 0; i < movObs.length; i++) {
-    let lat = movObs[i].latitude;
-    let lon = movObs[i].longitude;
-    let radius = movObs[i].sphere_radius * 0.3048;
+    let lat = movObs[i].pos.lat;
+    let lon = movObs[i].pos.lon;
+    let radius = movObs[i].radius * 0.3048;
 
     let circle = generateCircle(lat, lon, radius);
 
@@ -218,7 +220,7 @@ function buildTargetsData(targets) {
 
   for (let i = 0; i < targets.length; i++) {
     if (
-      filteredTargets[i].type === 'standard' &&
+      targets[i].type === Interop.Odlc.Type.STANDARD &&
       drawnTargets.indexOf(targets[i].id) == -1
     ) {
       filteredTargets.push(targets[i]);
@@ -341,9 +343,9 @@ class DashboardMap extends MapboxMap {
     let flyZoneData = buildFlyZoneData(mission);
     let homePosition = extractPoint(mission.home_pos);
     let waypointsData = buildWaypointsData(mission);
-    let offAxisTargetPosition = extractPoint(mission.off_axis_odlc_pos);
+    let offAxisTargetPosition = extractPoint(mission.off_axis_pos);
     let emergentLastKnownPosition = extractPoint(
-      mission.emergent_last_known_pos
+      mission.emergent_pos
     );
     let searchAreaData = buildSearchAreaData(mission);
 
@@ -655,7 +657,7 @@ class DashboardMap extends MapboxMap {
   _setTargets(targetsData) {
     let targetsGeoData = [];
     for (let i = 0; i < targetsData.length; i++) {
-      targetsGeoData.push([targetsData[i].longitude, targetsData[i].latitude]);
+      targetsGeoData.push([targetsData[i].lon, targetsData[i].lat]);
     }
 
     targetsData = {
@@ -702,32 +704,32 @@ class DashboardMap extends MapboxMap {
           targetsData[i].id +
           '\n' +
           'Orientation: ' +
-          targetsData[i].orientation +
+          enums.Odlc.Orientation[targetsData[i].orientation] +
           '\n' +
           'Shape: ' +
-          targetsData[i].shape +
+          enums.Odlc.Shape[targetsData[i].shape] +
           '\n' +
           'Color: ' +
-          targetsData[i].background_color +
+          enums.Odlc.Color[targetsData[i].background_color] +
           '\n' +
           'Text: ' +
-          targetsData[i].alphanumeric +
+          enums.Odlc.Text[targetsData[i].alphanumeric] +
           '\n' +
           'Text Color: ' +
-          targetsData[i].alphanumeric_color +
+          enums.Odlc.Color[targetsData[i].alphanumeric_color] +
           '\n' +
           'Description: ' +
           targetsData[i].description +
           '\n' +
           'Autonomous: ' +
-          targetsData[i].autonomous
+          targetsData[i].autonomous ? 'Yes' : 'No'
       );
 
       let el = document.createElement('div');
       el.className = 'marker';
 
       new mapboxGL.Marker(el, { offset: [-25, -25] })
-        .setLngLat([targetsData[i].longitude, targetsData[i].latitude])
+        .setLngLat([targetsData[i].lon, targetsData[i].lat])
         .setPopup(popup)
         .addTo(this);
     }

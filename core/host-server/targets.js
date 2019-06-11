@@ -1,9 +1,3 @@
-'use strict';
-
-const request = require('request');
-
-const TargetType = require('../../util/types').Target;
-
 module.exports = function Targets(server, interop) {
   let targets = {};
   targets.polling = true;
@@ -17,7 +11,7 @@ module.exports = function Targets(server, interop) {
     if (!targets.polling) return;
 
     try {
-      interop.getTargets((targets) => {
+      interop.getTargets().then((targets) => {
         server.broadcast({
           type: 'targets',
           //message: new TargetType(targets).serialize()

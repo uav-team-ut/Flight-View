@@ -1,5 +1,3 @@
-'use strict';
-
 const IPCServer = require('./net/ipc-server');
 const HostServer = require('./host-server');
 
