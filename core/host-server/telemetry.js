@@ -1,4 +1,4 @@
-const telem = requre('./proto/telem');
+const telem = require('./proto/messages').telemetry;
 
 const request = require('superagent');
 const addProtobuf = require('superagent-protobuf');
@@ -8,12 +8,12 @@ addProtobuf(request);
 class Telemetry {
   constructor(server) {
     this._server = server;
-    this._url = process.env.TELEMETRY_URL || `127.0.0.1:5000`;
+    this._url = process.env.TELEMETRY_URL || '127.0.0.1:5000';
     this._polling = true;
 
     this.start();
   }
-  
+
   start() {
     console.log('Starting telemetry poller');
 
@@ -28,7 +28,7 @@ class Telemetry {
   async _poll() {
     if (!this._polling) return;
 
-    server.broadcast({
+    this._server.broadcast({
       type: 'telemetry',
       message: (await request
         .get(`${this._url}/api/overview`)
@@ -42,7 +42,7 @@ class Telemetry {
   async _pollWaypoints() {
     if (!this._polling) return;
 
-    server.broadcast({
+    this._server.broadcast({
       type: 'waypoints',
       message: {
         mission_waypoints: (await request

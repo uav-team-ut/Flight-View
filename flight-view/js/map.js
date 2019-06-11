@@ -3,6 +3,7 @@ const path = require('path');
 const remote = require('electron').remote;
 
 const enums = require('util/enums');
+const interop = require('../../proto/messages').interop;
 
 const mapboxGL = require('mapbox-gl/dist/mapbox-gl');
 
@@ -29,8 +30,8 @@ const icons = {
 
 let drawnTargets = [];
 
-EARTH_RADIUS = 6371008;
-EARTH_ECCEN = 0.081819;
+const EARTH_RADIUS = 6371008;
+const EARTH_ECCEN = 0.081819;
 
 let satelliteSource = {
   type: 'raster',
@@ -220,7 +221,7 @@ function buildTargetsData(targets) {
 
   for (let i = 0; i < targets.length; i++) {
     if (
-      targets[i].type === Interop.Odlc.Type.STANDARD &&
+      targets[i].type === interop.Odlc.Type.STANDARD &&
       drawnTargets.indexOf(targets[i].id) == -1
     ) {
       filteredTargets.push(targets[i]);

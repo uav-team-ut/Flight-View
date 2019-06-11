@@ -8,6 +8,7 @@
     "postinstall": "node scripts/install-dependencies.js",
     "test": "mocha tests --recursive",
     "test-travis": "./scripts/run-tests-travis.sh",
+    "build-msg": "pbjs -t static-module --keep-case -o proto/messages.js proto/*.proto",
     "build-docs": "jsdoc flight-view core util -r -R README.md -d docs"
   },
   "author": "Unmanned Aerial Vehicle Team | University of Texas at Austin",
@@ -28,6 +29,7 @@
     "mapbox-gl": "^0.38.0",
     "nedb": "^1.8.0",
     "node-ipc": "^8.10.2",
+    "protobufjs": "^6.8.8",
     "request": "^2.79.0",
     "sprintf-js": "^1.0.3",
     "superagent": "^5.0.6",

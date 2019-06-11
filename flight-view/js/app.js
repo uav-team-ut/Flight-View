@@ -1,17 +1,13 @@
 const remote = require('electron').remote;
-
 const angular = require('angular');
-const angularAnimate = require('angular-animate');
-const angularSanitize = require('angular-sanitize');
-const angularUIBootstrap = require('angular-ui-bootstrap');
 
 const IPCClient = require('./ipc-client');
+
+const telemetry = require('../../proto/messages').telemetry;
 
 let coreClient = new IPCClient('flight-view', 'core');
 
 exports.coreClient = coreClient;
-
-let default_telemetry = new Telemetry({}, { filled: true });
 
 angular
   .module('flightView', ['ngAnimate', 'ngSanitize', 'ui.bootstrap'])
@@ -62,7 +58,7 @@ angular
     '$element',
     '$attrs',
     ($scope, $element, $attrs) => {
-      $scope.telemetry = default_telemetry;
+      $scope.telemetry = telemetry.Overview.create({});
 
       function eventListener(message) {
         $scope.telemetry = message;

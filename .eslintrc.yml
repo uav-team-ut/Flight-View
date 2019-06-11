@@ -1,14 +1,13 @@
 env:
   es6: true
   node: true
-plugins:
-  - jest
 extends:
   - 'eslint:recommended'
-  - 'plugin:jest/recommended'
 parserOptions:
   ecmaVersion: 2017
   sourceType: module
+globals:
+  document: readonly
 rules:
   max-len:
     - error
@@ -30,3 +29,6 @@ rules:
   semi:
     - error
     - always
+  no-console: 0
+  no-unused-vars:
+    - warn

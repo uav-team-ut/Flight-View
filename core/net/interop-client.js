@@ -1,4 +1,4 @@
-const interop = requre('./proto/interop');
+const interop = require('./proto/messages').interop;
 
 const request = require('superagent').agent();
 const addProtobuf = require('superagent-protobuf');

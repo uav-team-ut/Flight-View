@@ -3,7 +3,6 @@
 const EventEmitter = require('events');
 
 const express = require('express');
-const bodyParser = require('body-parser');
 
 const InteropClient = require('../net/interop-client');
 const Telemetry = require('./telemetry');

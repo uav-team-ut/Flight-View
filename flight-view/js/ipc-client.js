@@ -1,5 +1,3 @@
-'use strict';
-
 const IPC = require('node-ipc').IPC;
 
 const MessageHandler = require('../../util/message-handler');
