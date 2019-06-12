@@ -6,11 +6,11 @@
       <div class="attitude-box-outer">
         <div
           class="attitude-box-inner"
-          ng-style="{'-webkit-transform': 'rotate(' + telemetry.roll.degrees + 'deg)'}"
+          ng-style="{'-webkit-transform': 'rotate(' + telemetry.rot.roll + 'deg)'}"
         >
           <div
             class="attitude-box-inner"
-            ng-style="{'-webkit-transform': 'translateY(' + telemetry.pitch.degrees * 1.7 + '%)'}"
+            ng-style="{'-webkit-transform': 'translateY(' + telemetry.rot.pitch * 1.7 + '%)'}"
           >
             <div class="attitude-box-inner horizon"></div>
 
@@ -18,7 +18,7 @@
               <div
                 class="attitude-box-inner"
                 ng-style="{top: 'calc(50% - ' + pitch * 1.7 + '%)'}"
-                ng-if="Math.abs(pitch - telemetry.pitch.degrees) <= 23"
+                ng-if="Math.abs(pitch - telemetry.rot.pitch) <= 23"
               >
                 <div class="line pitch-marker-minor-line-left"></div>
                 <div class="line pitch-marker-minor-line-right"></div>
@@ -29,7 +29,7 @@
               <div
                 class="attitude-box-inner"
                 ng-style="{top: 'calc(50% - ' + pitch * 1.7 + '%)'}"
-                ng-if="Math.abs(pitch - telemetry.pitch.degrees) <= 23"
+                ng-if="Math.abs(pitch - telemetry.rot.pitch) <= 23"
               >
                 <div class="line pitch-marker-major-line-left"></div>
                 <div class="line pitch-marker-major-line-right"></div>
@@ -144,7 +144,7 @@
         AIRSPEED
       </div>
       <div class="text-box-number">
-        {{telemetry.format('%.0f', 'airspeed', 'knots').toUpperCase()}}
+        {{sprintf('%.0f m/s', telemetry.speed.airspeed).toUpperCase()}}
       </div>
     </div>
 
@@ -153,14 +153,14 @@
         ALT MSL
       </div>
       <div class="text-box-number">
-        {{telemetry.format('%.0f', 'alt_msl', 'feet').toUpperCase()}}
+        {{sprintf('%.0f meters', telemetry.alt.msl).toUpperCase()}}
       </div>
     </div>
 
     <div class="text-box ground-speed-display">
       <div class="text-box-header">GROUND<br />SPEED</div>
       <div class="text-box-number">
-        {{telemetry.format('%.0f', 'groundspeed', 'knots').toUpperCase()}}
+        {{sprintf('%.0f m/s', telemetry.speed.ground_speed).toUpperCase()}}
       </div>
     </div>
 
@@ -169,7 +169,7 @@
         ALT AGL
       </div>
       <div class="text-box-number">
-        {{telemetry.format('%.0f', 'alt', 'feet').toUpperCase()}}
+        {{sprintf('%.0f meters', telemetry.alt.agl).toUpperCase()}}
       </div>
     </div>
 
@@ -178,7 +178,7 @@
         PITCH
       </div>
       <div class="text-box-number">
-        {{telemetry.format('%.0f', 'pitch', 'degrees').toUpperCase()}}
+        {{sprintf('%.0f degrees', telemetry.rot.pitch).toUpperCase()}}
       </div>
     </div>
 
@@ -187,7 +187,7 @@
         ROLL
       </div>
       <div class="text-box-number">
-        {{telemetry.format('%.0f', 'roll', 'degrees').toUpperCase()}}
+        {{sprintf('%.0f degrees', telemetry.rot.roll).toUpperCase()}}
       </div>
     </div>
   </div>
@@ -196,7 +196,7 @@
 
   <div
     class="heading-scale"
-    ng-style="{'-webkit-transform': 'translateX(' + telemetry.yaw.degrees * -1 + '%)'}"
+    ng-style="{'-webkit-transform': 'translateX(' + telemetry.rot.yaw * -1 + '%)'}"
   >
     <div ng-repeat="i in headingMinor">
       <div
@@ -233,7 +233,7 @@
         HEADING
       </div>
       <div class="text-box-number">
-        {{telemetry.format('%.0f', 'yaw', 'degrees').toUpperCase()}}
+        {{sprintf('%.0f', telemetry.rot.yaw).toUpperCase()}}
       </div>
     </div>
 
@@ -242,7 +242,7 @@
         AIR TIME
       </div>
       <div class="text-box-number">
-        {{telemetry.air_time.hhmmss}}
+        {{new Date(telemetry.time * 1000)}}
       </div>
     </div>
 
@@ -264,20 +264,19 @@
 
     <div class="text-box battery-percentage-display">
       <div class="text-box-number">
-        {{telemetry.format('%.0f', 'battery_percentage',
-        'percent').toUpperCase()}}
+        {{sprintf('%.0f%%', telemetry.battery.percentage).toUpperCase()}}
       </div>
     </div>
 
     <div class="text-box battery-voltage-display">
       <div class="text-box-number">
-        {{telemetry.format('%.1f', 'battery_voltage', 'volts').toUpperCase()}}
+        {{sprintf('%.1f volts', telemetry.battery.voltage).toUpperCase()}}
       </div>
     </div>
 
     <div class="text-box battery-current-display">
       <div class="text-box-number">
-        {{telemetry.format('%.1f', 'battery_current', 'amps').toUpperCase()}}
+        {{sprintf('%.1f amps', telemetry.battery.current).toUpperCase()}}
       </div>
     </div>
 

@@ -22,9 +22,9 @@ module.exports = class HostServer extends EventEmitter {
     this._app.locals.hostServer = this;
     this._app.locals.coreServer = coreServer;
     this._app.locals.coreSocket = coreSocket;
-    this._app.locals.interopClient = new InteropClient();
-    this._app.locals.telemetry = Telemetry(this);
-    this._app.locals.targets = Targets(this, this.interopClient);
+    this._app.locals.interopClient = new InteropClient(this);
+    this._app.locals.telemetry = new Telemetry(this);
+    this._app.locals.targets = new Targets(this, this.interopClient);
 
     this._listeners = {};
   }
@@ -35,8 +35,9 @@ module.exports = class HostServer extends EventEmitter {
 
   close() {
     this._httpServer.close();
-    this.telemetry.close();
-    this.targets.close();
+    this.telemetry.stop();
+    this.targets.stop();
+    this.interopClient.stop();
   }
 
   broadcast(message) {

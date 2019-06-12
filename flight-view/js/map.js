@@ -2,7 +2,7 @@ const path = require('path');
 
 const remote = require('electron').remote;
 
-const enums = require('util/enums');
+const enums = require('../../util/enums');
 const interop = require('../../proto/messages').interop;
 
 const mapboxGL = require('mapbox-gl/dist/mapbox-gl');

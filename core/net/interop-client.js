@@ -1,9 +1,11 @@
-const interop = require('./proto/messages').interop;
+const interop = require('../../proto/messages').interop;
 
-const request = require('superagent').agent();
+const superagent = require('superagent');
 const addProtobuf = require('superagent-protobuf');
 
-addProtobuf(request);
+addProtobuf(superagent);
+
+const request = superagent.agent();
 
 class InteropClient {
   constructor(server) {
@@ -19,29 +21,35 @@ class InteropClient {
     const broadcastMission = async () => {
       this._server.broadcast({
         type: 'interop-mission',
-        message: await this.interopClient.getMission()
+        message: await this.getMission()
       });
     };
 
     const broadcastObstacles = async () => {
       this._server.broadcast({
         type: 'obstacles',
-        message: await this.interopClient.getObstacles()
+        message: await this.getObstacles()
       });
     };
 
     const broadcastTargets = async () => {
       this._server.broadcast({
         type: 'targets',
-        message: await this.interopClient.getTargets()
+        message: await this.getTargets()
       });
     };
 
     const timeout = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
     const task = (fn, interval) => Promise.resolve().then(async () => {
       while (this._running) {
-        await fn();
-        await timeout(interval);
+        try {
+          await fn();
+        } catch (err) {
+          if (err.syscall !== 'getaddrinfo' && err.code !== 'ABORTED')
+            console.error(err);
+        } finally {
+          await timeout(interval);
+        }
       }
     }).catch(console.error);
 

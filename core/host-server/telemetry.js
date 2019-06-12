@@ -1,9 +1,11 @@
-const telem = require('./proto/messages').telemetry;
+const telem = require('../../proto/messages').telemetry;
 
-const request = require('superagent');
+const superagent = require('superagent');
 const addProtobuf = require('superagent-protobuf');
 
-addProtobuf(request);
+addProtobuf(superagent);
+
+const request = superagent.agent();
 
 class Telemetry {
   constructor(server) {
@@ -21,38 +23,48 @@ class Telemetry {
     this._pollWaypoints();
   }
 
-  close() {
+  stop() {
     this._polling = false;
   }
 
   async _poll() {
     if (!this._polling) return;
 
-    this._server.broadcast({
-      type: 'telemetry',
-      message: (await request
-        .get(`${this._url}/api/overview`)
-        .proto(telem.Overview)
-        .timeout(5000)).body
-    });
-
-    setTimeout(() => this._poll(), 500);
+    try {
+      this._server.broadcast({
+        type: 'telemetry',
+        message: (await request
+          .get(`${this._url}/api/overview`)
+          .proto(telem.Overview)
+          .timeout(5000)).body
+      });
+    } catch (err) {
+      if (err.syscall !== 'getaddrinfo' && err.code !== 'ABORTED')
+        console.error(err);
+    } finally {
+      setTimeout(() => this._poll(), 500);
+    }
   }
 
   async _pollWaypoints() {
     if (!this._polling) return;
 
-    this._server.broadcast({
-      type: 'waypoints',
-      message: {
-        mission_waypoints: (await request
-          .get(`${this._url}/api/raw-mission`)
-          .proto(telem.RawMission)
-          .timeout(5000)).body
-      }
-    });
-
-    setTimeout(() => this._pollWaypoints(), 2500);
+    try {
+      this._server.broadcast({
+        type: 'waypoints',
+        message: {
+          mission_waypoints: (await request
+            .get(`${this._url}/api/raw-mission`)
+            .proto(telem.RawMission)
+            .timeout(5000)).body
+        }
+      });
+    } catch (err) {
+      if (err.syscall !== 'getaddrinfo' && err.code !== 'ABORTED')
+        console.error(err);
+    } finally {
+      setTimeout(() => this._pollWaypoints(), 2500);
+    }
   }
 }
 

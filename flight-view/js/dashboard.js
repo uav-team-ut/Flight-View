@@ -42,9 +42,9 @@ angular
               $scope.map.on('load', () => {
                 $scope.$watch('telemetry.lat.degrees', () => {
                   $scope.map.setPlanePosition(
-                    $scope.telemetry.lat.degrees,
-                    $scope.telemetry.lon.degrees,
-                    $scope.telemetry.yaw.degrees
+                    $scope.telemetry.pos.lat,
+                    $scope.telemetry.pos.lon,
+                    $scope.telemetry.rot.yaw
                   );
                 });
               });
@@ -97,7 +97,7 @@ angular
             $scope.headingMinor = [];
             $scope.headingMajor = [];
 
-            let heading = $scope.telemetry.yaw.degrees;
+            let heading = $scope.telemetry.rot.yaw;
             let direction = ['N', 'NE', 'E', 'SE', 'S', 'SW', 'W', 'NW'];
 
             for (let i = -500; i <= 500; i += 5) {
@@ -118,7 +118,7 @@ angular
 
           setHeadingLines();
 
-          $scope.$watch('telemetry.yaw.degrees', () => {
+          $scope.$watch('telemetry.rot.yaw', () => {
             setHeadingLines();
           });
         }

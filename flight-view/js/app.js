@@ -1,5 +1,8 @@
 const remote = require('electron').remote;
 const angular = require('angular');
+const angularAnimate = require('angular-animate');
+const angularSanitize = require('angular-sanitize');
+const angularUIBootstrap = require('angular-ui-bootstrap');
 
 const IPCClient = require('./ipc-client');
 
@@ -58,7 +61,16 @@ angular
     '$element',
     '$attrs',
     ($scope, $element, $attrs) => {
-      $scope.telemetry = telemetry.Overview.create({});
+      $scope.telemetry = telemetry.Overview.create({
+        time: 0,
+        pos: {},
+        rot: {},
+        alt: {},
+        vel: {},
+        speed: {},
+        battery: {}
+      });
+      console.log($scope.telemetry);
 
       function eventListener(message) {
         $scope.telemetry = message;

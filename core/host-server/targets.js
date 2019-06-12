@@ -1,31 +1,43 @@
-module.exports = function Targets(server, interop) {
-  let targets = {};
-  targets.polling = true;
-  targets.close = function() {
-    targets.polling = false;
-  };
+class Targets {
+  constructor(server, interop) {
+    this._server = server;
+    this._interop = interop;
+    this._running = false;
+    this.start();
+  }
 
-  console.log('Starting targets poller');
+  start() {
+    this._running = true;
 
-  targets._poll = function() {
-    if (!targets.polling) return;
+    console.log('Starting targets poller');
 
-    try {
-      interop.getTargets().then((targets) => {
-        server.broadcast({
-          type: 'targets',
-          //message: new TargetType(targets).serialize()
-          message: targets
-        });
-      });
-    } catch (e) {
-      console.error(e);
-    } finally {
-      setTimeout(() => targets._poll(), 500);
-    }
-  };
+    const timeout = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
+    const task = (fn, interval) => Promise.resolve().then(async () => {
+      while (this._running) {
+        try {
+          await fn();
+        } catch (err) {
+          if (err.syscall !== 'getaddrinfo' && err.code !== 'ABORTED')
+            console.error(err);
+        } finally {
+          await timeout(interval);
+        }
+      }
+    }).catch(console.error);
 
-  targets._poll();
+    task(this._poll.bind(this), 500);
+  }
 
-  return targets;
-};
+  stop() {
+    this._running = false;
+  }
+
+  async _poll() {
+    this._server.broadcast({
+      type: 'targets',
+      message: await this._interop.getTargets()
+    });
+  }
+}
+
+module.exports = Targets;
