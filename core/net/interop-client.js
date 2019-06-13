@@ -64,7 +64,7 @@ class InteropClient {
 
   async getMission() {
     return (await request.get(`${this._url}/api/mission`)
-      .proto(interop.Mission)
+      .proto(interop.InteropMission)
       .timeout(1000)).body;
   }
 

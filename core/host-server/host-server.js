@@ -11,7 +11,7 @@ const Targets = require('./targets');
 const DEFAULT_PORT = 25005;
 
 module.exports = class HostServer extends EventEmitter {
-  constructor(coreServer, coreSocket, allowListeners, port) {
+  constructor(coreServer, coreSocket, port) {
     super();
 
     this._port = port || DEFAULT_PORT;
@@ -25,8 +25,6 @@ module.exports = class HostServer extends EventEmitter {
     this._app.locals.interopClient = new InteropClient(this);
     this._app.locals.telemetry = new Telemetry(this);
     this._app.locals.targets = new Targets(this, this.interopClient);
-
-    this._listeners = {};
   }
 
   listen() {
