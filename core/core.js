@@ -45,6 +45,10 @@ coreServer.onMessage('map-cache-image', (message, socket) => {
   );
 });
 
+coreServer.onMessage('get-plane-mission', async (_message, _socket) => {
+  await activeServer.telemetry.pollRawMission();
+});
+
 coreServer.listen();
 
 module.exports = {

@@ -32,6 +32,11 @@
   flex-grow: 1;
   margin-top: 10px;
   background-color: gray;
+  color: #404040;
+  text-align: center;
+  vertical-align: middle;
+  line-height: 90px;
+  font-size: small;
 }
 
 .dashboard-map {

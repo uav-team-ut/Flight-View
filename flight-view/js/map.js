@@ -113,10 +113,26 @@ function buildWaypointsData(mission) {
   let waypoints = mission.waypoints;
   let waypointsCoordinates = [];
 
-  waypointsCoordinates.sort((a, b) => parseInt(a.order) - parseInt(b.order));
-
   for (let i = 0; i < waypoints.length; i++) {
     waypointsCoordinates.push([waypoints[i].lon, waypoints[i].lat]);
+  }
+
+  return {
+    type: 'Feature',
+    geometry: {
+      type: 'LineString',
+      coordinates: waypointsCoordinates
+    }
+  };
+}
+
+function buildTelemWaypointsData(mission) {
+  let waypoints = mission.mission_items;
+  if (!waypoints) return null;
+  let waypointsCoordinates = [];
+
+  for (let i = 0; i < waypoints.length; i++) {
+    waypointsCoordinates.push([waypoints[i].x, waypoints[i].y]);
   }
 
   return {
@@ -320,8 +336,8 @@ class DashboardMap extends MapboxMap {
       mapGeneralMenu.popup(remote.getCurrentWindow());
     });
 
-    this.on('error', (data) => {
-      console.log(data);
+    this.on('error', (err) => {
+      console.error(err);
     });
   }
 
@@ -342,7 +358,7 @@ class DashboardMap extends MapboxMap {
   setInteropMission(mission) {
     let airDropPosition = extractPoint(mission.air_drop_pos);
     let flyZoneData = buildFlyZoneData(mission);
-    let homePosition = extractPoint(mission.home_pos);
+    // let homePosition = extractPoint(mission.home_pos);
     let waypointsData = buildWaypointsData(mission);
     let offAxisTargetPosition = extractPoint(mission.off_axis_pos);
     let emergentLastKnownPosition = extractPoint(
@@ -352,7 +368,7 @@ class DashboardMap extends MapboxMap {
 
     this._setAirDropPosition(airDropPosition);
     this._setFlyZone(flyZoneData);
-    this._setHomePosition(homePosition);
+    // this._setHomePosition(homePosition);
     this._setWaypoints(waypointsData);
     this._setOffAxisTargetPosition(offAxisTargetPosition);
     this._setEmergentLastKnownPosition(emergentLastKnownPosition);
@@ -361,10 +377,10 @@ class DashboardMap extends MapboxMap {
 
   setObstacles(obstacles) {
     let statObsData = buildStatObsData(obstacles);
-    let movObsData = buildMovObsData(obstacles);
+    // let movObsData = buildMovObsData(obstacles);
 
     this._setStatObs(statObsData);
-    this._setMovObs(movObsData);
+    // this._setMovObs(movObsData);
   }
 
   setTargets(targets) {
@@ -377,6 +393,13 @@ class DashboardMap extends MapboxMap {
     let waypointsData = buildWaypointsData(waypoints);
 
     this._setWaypoints(waypointsData);
+  }
+
+  setRawMission(mission) {
+    let waypointsData = buildTelemWaypointsData(mission);
+    if (!waypointsData) return;
+
+    this._setRawMission(waypointsData);
   }
 
   setPlanePosition(lat, lon, yaw) {
@@ -528,6 +551,30 @@ class DashboardMap extends MapboxMap {
       });
     } else {
       this.getSource('interop-waypoints').setData(waypointsData);
+    }
+  }
+
+  _setRawMission(waypointsData) {
+    if (this.getSource('telem-mission') === undefined) {
+      this.addSource('telem-mission', {
+        type: 'geojson',
+        data: waypointsData
+      });
+
+      this.addLayer({
+        id: 'telem-mission',
+        type: 'line',
+        source: 'telem-mission',
+        layout: {
+          'line-join': 'bevel'
+        },
+        paint: {
+          'line-color': '#0000ff',
+          'line-width': 4
+        }
+      });
+    } else {
+      this.getSource('telem-mission').setData(waypointsData);
     }
   }
 

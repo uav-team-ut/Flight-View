@@ -24,6 +24,10 @@
                 </div>
                 <ul class="nav navbar-nav navbar-right">
                     <li>
+                        <button id="plane-mission-button" type="button" class="btn navbar-btn"
+                                ng-click="getPlaneMission()" ng-show="started">
+                            &nbsp;Get Plane Mission&nbsp;
+                        </button>
                         <div class="btn-group" uib-dropdown ng-hide="started">
                             <button id="start-button" type="button" class="btn btn-success navbar-btn"
                                     uib-dropdown-toggle>

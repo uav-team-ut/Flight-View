@@ -69,11 +69,11 @@ angular
 
           coreClient.onMessage('targets', targetListener);
 
-          function waypointListener(message) {
-            $scope.map.setWaypoints(message);
+          function rawMissionListener(message) {
+            $scope.map.setRawMission(message);
           }
 
-          coreClient.onMessage('waypoints', waypointListener);
+          coreClient.onMessage('raw-mission', rawMissionListener);
 
           $element.on('$destroy', () => {
             coreClient.removeListener('interop-mission', missionListener);

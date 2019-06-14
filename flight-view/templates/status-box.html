@@ -144,7 +144,7 @@
         AIRSPEED
       </div>
       <div class="text-box-number">
-        {{sprintf('%.0f m/s', telemetry.speed.airspeed).toUpperCase()}}
+        {{sprintf('%.0f knots', msToKnots(telemetry.speed.airspeed))}}
       </div>
     </div>
 
@@ -153,14 +153,14 @@
         ALT MSL
       </div>
       <div class="text-box-number">
-        {{sprintf('%.0f meters', telemetry.alt.msl).toUpperCase()}}
+        {{sprintf('%.0f ft', metersToFeet(telemetry.alt.msl))}}
       </div>
     </div>
 
     <div class="text-box ground-speed-display">
       <div class="text-box-header">GROUND<br />SPEED</div>
       <div class="text-box-number">
-        {{sprintf('%.0f m/s', telemetry.speed.ground_speed).toUpperCase()}}
+        {{sprintf('%.0f knots', msToKnots(telemetry.speed.ground_speed))}}
       </div>
     </div>
 
@@ -169,7 +169,7 @@
         ALT AGL
       </div>
       <div class="text-box-number">
-        {{sprintf('%.0f meters', telemetry.alt.agl).toUpperCase()}}
+        {{sprintf('%.0f ft', metersToFeet(telemetry.alt.agl))}}
       </div>
     </div>
 
@@ -178,7 +178,7 @@
         PITCH
       </div>
       <div class="text-box-number">
-        {{sprintf('%.0f degrees', telemetry.rot.pitch).toUpperCase()}}
+        {{sprintf('%.0f', telemetry.rot.pitch)}}
       </div>
     </div>
 
@@ -187,7 +187,7 @@
         ROLL
       </div>
       <div class="text-box-number">
-        {{sprintf('%.0f degrees', telemetry.rot.roll).toUpperCase()}}
+        {{sprintf('%.0f', telemetry.rot.roll)}}
       </div>
     </div>
   </div>
@@ -219,6 +219,7 @@
   <div class="middle-container">
     <div></div>
 
+    <!--
     <div class="text-box mode-display">
       <div class="text-box-header">
         MODE
@@ -227,13 +228,14 @@
         {{telemetry.mode}}
       </div>
     </div>
+    -->
 
     <div class="text-box heading-display">
       <div class="text-box-header">
         HEADING
       </div>
       <div class="text-box-number">
-        {{sprintf('%.0f', telemetry.rot.yaw).toUpperCase()}}
+        {{sprintf('%.0f', telemetry.rot.yaw)}}
       </div>
     </div>
 
@@ -242,7 +244,7 @@
         AIR TIME
       </div>
       <div class="text-box-number">
-        {{new Date(telemetry.time * 1000)}}
+        {{getAirTime(telemetry.time)}}
       </div>
     </div>
 
@@ -264,19 +266,19 @@
 
     <div class="text-box battery-percentage-display">
       <div class="text-box-number">
-        {{sprintf('%.0f%%', telemetry.battery.percentage).toUpperCase()}}
+        {{sprintf('%.0f%%', telemetry.battery.percentage)}}
       </div>
     </div>
 
     <div class="text-box battery-voltage-display">
       <div class="text-box-number">
-        {{sprintf('%.1f volts', telemetry.battery.voltage).toUpperCase()}}
+        {{sprintf('%.1f V', telemetry.battery.voltage)}}
       </div>
     </div>
 
     <div class="text-box battery-current-display">
       <div class="text-box-number">
-        {{sprintf('%.1f amps', telemetry.battery.current).toUpperCase()}}
+        {{sprintf('%.1f A', telemetry.battery.current)}}
       </div>
     </div>
 

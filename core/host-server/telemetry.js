@@ -20,7 +20,8 @@ class Telemetry {
     console.log('Starting telemetry poller');
 
     this._poll();
-    this._pollWaypoints();
+    // bradley said to comment this
+    // this._pollRawMission();
   }
 
   stop() {
@@ -46,24 +47,18 @@ class Telemetry {
     }
   }
 
-  async _pollWaypoints() {
-    if (!this._polling) return;
-
+  async pollRawMission() {
     try {
       this._server.broadcast({
-        type: 'waypoints',
-        message: {
-          mission_waypoints: (await request
-            .get(`${this._url}/api/raw-mission`)
-            .proto(telem.RawMission)
-            .timeout(5000)).body
-        }
+        type: 'raw-mission',
+        message: (await request
+          .get(`${this._url}/api/raw-mission`)
+          .proto(telem.RawMission)
+          .timeout(5000)).body
       });
     } catch (err) {
       if (err.syscall !== 'getaddrinfo' && err.code !== 'ABORTED')
         console.error(err);
-    } finally {
-      setTimeout(() => this._pollWaypoints(), 2500);
     }
   }
 }

@@ -4,6 +4,8 @@ const angularAnimate = require('angular-animate');
 const angularSanitize = require('angular-sanitize');
 const angularUIBootstrap = require('angular-ui-bootstrap');
 
+const sprintf = require('sprintf-js').sprintf;
+
 const IPCClient = require('./ipc-client');
 
 const telemetry = require('../../proto/messages').telemetry;
@@ -26,7 +28,7 @@ angular
         let webContents = remote.getCurrentWebContents();
 
         if (!webContents.isDevToolsOpened()) {
-          webContents.openDevTools({ detach: true });
+          webContents.openDevTools({ mode: 'detach' });
         } else {
           webContents.closeDevTools();
         }
@@ -53,6 +55,13 @@ angular
 
         // TODO: Verify that the server stopped successfully
         $scope.started = false;
+      };
+
+      $scope.getPlaneMission = () => {
+        coreClient.send({
+          type: 'get-plane-mission',
+          message: null
+        });
       };
     }
   ])
@@ -82,5 +91,14 @@ angular
       $element.on('$destroy', () => {
         coreClient.removeListener('telemetry', eventListener);
       });
+
+      $scope.getAirTime = (time) => {
+        return new Date(time * 1000).toTimeString().replace(/.*(\d{2}:\d{2}:\d{2}).*/, '$1');
+      };
+
+      $scope.metersToFeet = (meters) => meters / .3048;
+      $scope.msToKnots = (ms) => ms / .514444;
+
+      $scope.sprintf = sprintf;
     }
   ]);
